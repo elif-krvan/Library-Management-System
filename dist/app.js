@@ -23,7 +23,7 @@ class App {
                 this.app.use(constrants_1.Const.ROUTE_EMPTY, this.appRouter);
                 this.appRouter.use(constrants_1.Const.ROUTE_USER, user_controller_1.default);
                 // dotenv.config({path: path.resolve(__dirname, "config/.env")});
-                console.log(dotenv_1.default.config({ path: path_1.default.resolve("./src/config/.env") }));
+                console.log(dotenv_1.default.config({ path: path_1.default.resolve(".env") }));
             }
             catch (error) {
                 console.log(error);

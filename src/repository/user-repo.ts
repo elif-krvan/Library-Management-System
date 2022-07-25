@@ -11,9 +11,9 @@ export class UserRepo {
 
     create_user(user: User): Promise<User> {
         return new Promise<User> (async (resolve, reject) => {
-            this.user_exist(user.name, user.surname, user.email).then(({user_exist, msg}) => {
+            this.user_exist(user.email).then((user_exist) => {
                 if (user_exist) {
-                    reject(new UserAlreadyExistExc(msg)); //?
+                    reject(new UserAlreadyExistExc());
                 } else {
                     user.id = uuid();
                     user.signup_date = new Date;
@@ -49,20 +49,16 @@ export class UserRepo {
             } else {
                 const deletedUser: User = this.users[index];
                 this.users.splice(index, 1);
-                resolve(deletedUser); // maybe error
+                resolve(deletedUser);
             }
         });
     }
 
-    user_exist(name: string, surname: string, email: string): Promise<any> { //?
-        return new Promise<any> ((resolve, reject) => {
+    user_exist(email: string): Promise<boolean> {
+        return new Promise<boolean> ((resolve, reject) => {
             for ( let user of this.users ) {
-                if (user.name === name && user.surname === surname) {
-                    resolve({user_exist: true, msg: "account with same name and surname exists"}); //??
-                }
-
                 if (user.email === email) {
-                    resolve({user_exist: true, msg: "account with same email exists"}); //??
+                    resolve(true); 
                 }
             }
             resolve(false);

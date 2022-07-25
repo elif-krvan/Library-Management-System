@@ -42,7 +42,8 @@ class userController implements BaseRouter {
     private get_user_by_id = async (req: Request, res: Response) => {
         const id: string = req.params.user_id;
 
-        validation.id_schema.validateAsync(id).then((validated) => {
+        validation.id_schema.validateAsync(id).then((validated: string) => {
+            validated
             this.userService.get_user(validated).then((user) => {
                 
                 const succ_res: SuccessResponse = {
@@ -96,7 +97,7 @@ class userController implements BaseRouter {
             email: req.body.email
         }
 
-        validation.user_schema.validateAsync(new_user).then((validated) => {
+        validation.user_schema.validateAsync(new_user).then((validated: User) => {
             this.userService.create_user(validated).then((new_user) => {
                 const succ_res: SuccessResponse = {
                     data: new_user,
@@ -117,7 +118,7 @@ class userController implements BaseRouter {
     private delete_user = async (req: Request, res: Response) => {
         // delete the user if it exists
         const id: string = req.params.user_id;
-        validation.id_schema.validateAsync(id).then((validated) => {
+        validation.id_schema.validateAsync(id).then((validated: string) => {
             this.userService.delete_user(validated).then((deleted_user) => {
                 const succ_res: SuccessResponse = {
                     data: deleted_user,

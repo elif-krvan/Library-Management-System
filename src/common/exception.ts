@@ -22,7 +22,8 @@ export class UserNotFoundExc extends Exception {
 
 export class UserAlreadyExistExc extends Exception {
     constructor(error?: string) {
-        super(406, "user already exist", error);
+        let err: string = error || "user with the same e-mail exists";
+        super(406, "user already exist", err);
     }
 }
 

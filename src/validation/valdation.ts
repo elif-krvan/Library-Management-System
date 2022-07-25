@@ -4,16 +4,6 @@ import { ErrorResponse } from "../common/error";
 import { WrongRequestExc } from "../common/exception";
 
 class Validation {
-    validate(schema: ObjectSchema, value: any): Promise<boolean> {
-        return new Promise<any>((resolve, reject) => {
-            schema.validateAsync(value).then(() => {
-                resolve(true);
-            })
-            .catch((err) => {
-                reject(new WrongRequestExc(err.details[0].message));
-            })            
-        });
-    }
     
     validate_joi = (schema: ObjectSchema) => {
         return async (req: Request, res: Response, next: NextFunction) => {

@@ -34,6 +34,7 @@ class userController {
         this.get_user_by_id = (req, res) => __awaiter(this, void 0, void 0, function* () {
             const id = req.params.user_id;
             valdation_1.default.id_schema.validateAsync(id).then((validated) => {
+                validated;
                 this.userService.get_user(validated).then((user) => {
                     const succ_res = {
                         data: user,
