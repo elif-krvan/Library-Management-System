@@ -8,6 +8,6 @@ RUN yarn install
 
 RUN yarn build
 
-EXPOSE 4000
+# EXPOSE 4000
 
 CMD yarn start
