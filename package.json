@@ -6,7 +6,8 @@
     "start": "node dist/boot.js",
     "dev": "nodemon src/boot.ts",
     "test": "cross-env NODE_ENV=test nodemon src/boot.ts",
-    "build": "rimraf dist && tsc -p ."
+    "build": "rimraf dist && tsc -p .",
+    "migrate": "rimraf dist && tsc -p . && node dist/db/migrations/boot-migrate.js"
   },
   "license": "MIT",
   "dependencies": {

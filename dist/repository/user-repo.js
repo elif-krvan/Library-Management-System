@@ -8,19 +8,46 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UserRepo = void 0;
 const uuid_1 = require("uuid");
 const exception_1 = require("../common/exception");
+const db_1 = __importDefault(require("../db/db"));
 class UserRepo {
     constructor() {
         this.users = [];
     }
+    add_new_user(user) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return new Promise((resolve, reject) => __awaiter(this, void 0, void 0, function* () {
+                user.id = (0, uuid_1.v4)();
+                user.signup_date = new Date;
+                yield db_1.default.knx("user")
+                    .insert(user)
+                    .returning("*")
+                    .then((new_user) => {
+                    if (new_user[0]) {
+                        resolve(new_user[0]);
+                    }
+                    else {
+                        reject(new exception_1.DBExc("new user cannot be added"));
+                    }
+                })
+                    .catch((err) => {
+                    console.log(err);
+                    reject(new exception_1.UserAlreadyExistExc());
+                });
+            }));
+        });
+    }
     create_user(user) {
         return new Promise((resolve, reject) => __awaiter(this, void 0, void 0, function* () {
-            this.user_exist(user.name, user.surname, user.email).then(({ user_exist, msg }) => {
+            this.user_exist(user.email).then((user_exist) => {
                 if (user_exist) {
-                    reject(new exception_1.UserAlreadyExistExc(msg)); //?
+                    reject(new exception_1.UserAlreadyExistExc());
                 }
                 else {
                     user.id = (0, uuid_1.v4)();
@@ -54,26 +81,38 @@ class UserRepo {
             else {
                 const deletedUser = this.users[index];
                 this.users.splice(index, 1);
-                resolve(deletedUser); // maybe error
+                resolve(deletedUser);
             }
         });
     }
-    user_exist(name, surname, email) {
+    user_exist(email) {
         return new Promise((resolve, reject) => {
             for (let user of this.users) {
-                if (user.name === name && user.surname === surname) {
-                    resolve({ user_exist: true, msg: "account with same name and surname exists" }); //??
-                }
                 if (user.email === email) {
-                    resolve({ user_exist: true, msg: "account with same email exists" }); //??
+                    resolve(true);
                 }
             }
             resolve(false);
         });
     }
+    // get_users(): Promise<User[]> {
+    //     return new Promise<User[]> ((resolve, reject) => {
+    //         resolve(this.users);
+    //     });
+    // }
     get_users() {
-        return new Promise((resolve, reject) => {
-            resolve(this.users);
+        return __awaiter(this, void 0, void 0, function* () {
+            return new Promise((resolve, reject) => __awaiter(this, void 0, void 0, function* () {
+                yield db_1.default.knx("user")
+                    .select("*")
+                    .then((result) => {
+                    resolve(result);
+                })
+                    .catch((err) => {
+                    console.log(err);
+                    reject(false); //?
+                });
+            }));
         });
     }
 }

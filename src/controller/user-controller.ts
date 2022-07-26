@@ -63,6 +63,8 @@ class userController implements BaseRouter {
     }
 
     private add_user = async (req: Request, res: Response) => {
+        console.log(req.body)
+        // console.log(req)
         let new_user: User = {
             name: req.body.name,
             surname: req.body.surname,
@@ -97,7 +99,7 @@ class userController implements BaseRouter {
             email: req.body.email
         }
 
-        validation.user_schema.validateAsync(new_user).then((validated: User) => {
+        validation.user_schema.validateAsync(new_user).then((validated) => {
             this.userService.create_user(validated).then((new_user) => {
                 const succ_res: SuccessResponse = {
                     data: new_user,

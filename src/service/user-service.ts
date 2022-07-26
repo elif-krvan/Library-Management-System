@@ -10,7 +10,7 @@ export class UserService {
 
     create_user(user: User): Promise<User> {
         return new Promise<User> ((resolve, reject) => {
-            this.userRepo.create_user(user).then((new_user) => {
+            this.userRepo.add_new_user(user).then((new_user) => {
                 resolve(new_user);
             })
             .catch((err) => {
@@ -18,6 +18,16 @@ export class UserService {
             })
         });
     }
+    // create_user(user: User): Promise<User> {
+    //     return new Promise<User> ((resolve, reject) => {
+    //         this.userRepo.create_user(user).then((new_user) => {
+    //             resolve(new_user);
+    //         })
+    //         .catch((err) => {
+    //             reject(err);
+    //         })
+    //     });
+    // }
 
     get_user(user_id: string): Promise<User> {
         return new Promise<User> ((resolve, reject) => {

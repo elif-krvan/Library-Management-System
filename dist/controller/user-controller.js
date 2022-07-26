@@ -52,6 +52,8 @@ class userController {
             });
         });
         this.add_user = (req, res) => __awaiter(this, void 0, void 0, function* () {
+            console.log(req.body);
+            // console.log(req)
             let new_user = {
                 name: req.body.name,
                 surname: req.body.surname,

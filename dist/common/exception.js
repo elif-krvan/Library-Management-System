@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ValidationExc = exports.WrongRequestExc = exports.UserAlreadyExistExc = exports.UserNotFoundExc = exports.Exception = void 0;
+exports.DBExc = exports.ValidationExc = exports.WrongRequestExc = exports.UserAlreadyExistExc = exports.UserNotFoundExc = exports.Exception = void 0;
 class Exception extends Error {
     constructor(status, message, error, data) {
         super();
@@ -19,7 +19,8 @@ class UserNotFoundExc extends Exception {
 exports.UserNotFoundExc = UserNotFoundExc;
 class UserAlreadyExistExc extends Exception {
     constructor(error) {
-        super(406, "user already exist", error);
+        let err = error || "user with the same e-mail exists";
+        super(406, "user already exist", err);
     }
 }
 exports.UserAlreadyExistExc = UserAlreadyExistExc;
@@ -35,3 +36,9 @@ class ValidationExc extends Exception {
     }
 }
 exports.ValidationExc = ValidationExc;
+class DBExc extends Exception {
+    constructor(error) {
+        super(407, "database error", error);
+    }
+}
+exports.DBExc = DBExc;

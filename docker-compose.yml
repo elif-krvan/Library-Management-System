@@ -12,7 +12,7 @@ services:
     image: postgres:10.16
     environment:
       POSTGRESS_USER: postgres
-      POSTGRESS_PASSWORD: password
+      POSTGRESS_PASSWORD: 123456
       POSTGRESS_DB: postgres
     ports:
       - 5432:5432

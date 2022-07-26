@@ -38,3 +38,9 @@ export class ValidationExc extends Exception {
         super(407, "wrong request content", error.details[0].message);
     }
 }
+
+export class DBExc extends Exception {
+    constructor(error?: any) {
+        super(407, "database error", error);
+    }
+}

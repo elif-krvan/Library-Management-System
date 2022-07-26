@@ -1,6 +1,7 @@
 import { User } from "../model/user";
 import { v4 as uuid } from 'uuid';
-import { UserAlreadyExistExc, UserNotFoundExc } from "../common/exception";
+import { DBExc, UserAlreadyExistExc, UserNotFoundExc } from "../common/exception";
+import db from "../db/db";
 
 export class UserRepo {
     private users: User[];
@@ -8,66 +9,109 @@ export class UserRepo {
     constructor() {
         this.users = [];
     }
-
-    create_user(user: User): Promise<User> {
-        return new Promise<User> (async (resolve, reject) => {
-            this.user_exist(user.email).then((user_exist) => {
-                if (user_exist) {
+    
+    async add_new_user(user: User): Promise<User> {
+        return new Promise(async (resolve, reject) => {
+            this.user_exist(user.email).then(async (exists) => {
+                if (exists) {
                     reject(new UserAlreadyExistExc());
                 } else {
                     user.id = uuid();
                     user.signup_date = new Date;
-
-                    this.users.push(user);
-                    resolve(user);
-                }                
+                    
+                    await db.knx<User>("user")
+                    .insert(user)
+                    .returning("*")
+                    .then((new_user) => {
+                        if (new_user[0]) {
+                            resolve(new_user[0]); //add new user
+                        } else {
+                            reject(new DBExc("new user cannot be added")); 
+                        }                
+                    })
+                    .catch((err) => {
+                        console.log(err);
+                        reject(new DBExc(err));
+                    });  
+                }
             })
             .catch((err) => {
-                reject(err);
+                console.log(err);
+                reject(new DBExc(err));
+            }); //too much catch            
+        });        
+    }
+
+    async get_user(user_id: string): Promise<User> {
+        return new Promise<User> (async (resolve, reject) => {
+            await db.knx("user")
+            .select("*")
+            .where("id", user_id)
+            .then((result) => {
+                if (result[0]) {
+                    resolve(result[0]);
+                } else {
+                    reject(new UserNotFoundExc()); 
+                }  
+            })
+            .catch((err) => {
+                console.log(err);
+                reject(new DBExc(err));
+            }); 
+        });      
+    }
+
+    async delete_user(user_id: string): Promise<User> {
+        return new Promise<User> (async (resolve, reject) => {
+            this.get_user(user_id).then(async (user) => {
+                await db.knx("user")
+                .where("id", user_id)
+                .del()
+                .then((result) => {
+                    if (result != 0) {
+                        resolve(user);
+                    } else {
+                        reject(new UserNotFoundExc()); 
+                    }
+                })
+                .catch((err) => {
+                    console.log(err);
+                    reject(new DBExc(err));
+                });
+            })
+            .catch((err) => {
+                console.log(err);
+                reject(new DBExc(err));
+            });            
+        });
+    }
+
+    async user_exist(email: string): Promise<boolean> {
+        return new Promise<boolean> (async (resolve, reject) => {
+            await db.knx("user")
+            .select("id")
+            .where("email", email)
+            .then((result) => {
+                resolve(result.length != 0);
+            })
+            .catch((err) => {
+                console.log(err);
+                reject(new DBExc(err)); //?
             });
         });
     }
 
-    get_user(user_id: string): Promise<User> {
-        return new Promise<User> ((resolve, reject) => {
-            const result: User | undefined = this.users.find(x => x.id == user_id);
-
-            if ( result === undefined ) {
-                reject(new UserNotFoundExc());
-            } else {
-                resolve(result);
-            }
-        });        
-    }
-
-    delete_user(user_id: string): Promise<User> {
-        return new Promise<User> ((resolve, reject) => {
-            const index: number = this.users.findIndex(x => x.id == user_id);
-
-            if ( index === -1 ) {
-                reject(new UserNotFoundExc());
-            } else {
-                const deletedUser: User = this.users[index];
-                this.users.splice(index, 1);
-                resolve(deletedUser);
-            }
-        });
-    }
-
-    user_exist(email: string): Promise<boolean> {
-        return new Promise<boolean> ((resolve, reject) => {
-            for ( let user of this.users ) {
-                if (user.email === email) {
-                    resolve(true); 
-                }
-            }
-            resolve(false);
-        });
-    }
-
-    get_users(): Promise<User[]> {
-        return new Promise<User[]> ((resolve, reject) => {
-            resolve(this.users);
+    async get_users(): Promise<User[]> {
+        return new Promise<User[]> (async (resolve, reject) => {
+            await db.knx("user")
+            .select("*")
+            .then((result) => {
+                resolve(result)
+            })
+            .catch((err) => {
+                console.log(err);
+                reject(new DBExc(err));
+            }); 
         });
     }
 }

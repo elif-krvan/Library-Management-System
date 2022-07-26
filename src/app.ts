@@ -5,6 +5,7 @@ import { Const } from "./constants/constrants";
 // import dotenv from 'dotenv';
 // import path from "path";
 import config from "./config";
+import db from "./db/db";
 
 export class App {
     private app: Application;
@@ -18,16 +19,9 @@ export class App {
     init() {
         return new Promise((resolve, reject) => {
             try {
-                this.app.use(bodyparser.json());
-                this.app.use(bodyparser.urlencoded({extended: false}));
-    
-                this.app.use(Const.ROUTE_EMPTY,this.appRouter);
-                this.appRouter.use(Const.ROUTE_USER, user_controller);
-
+                db.start();
                 this.load_config();
-
-                // dotenv.config({path: path.resolve(__dirname, "config/.env")});
-                // console.log(dotenv.config({path: path.resolve( ".env")}))
+                this.load_router();
             } catch (error) {
                 console.log(error);
                 reject(false);
@@ -38,30 +32,23 @@ export class App {
     }
 
     load_config() {
-        config
+        this.app.use(bodyparser.json());
+        this.app.use(bodyparser.urlencoded({extended: false}));
+    }
+
+    load_router() {
+        this.app.use(Const.ROUTE_EMPTY, this.appRouter);
+        this.appRouter.use(Const.ROUTE_USER, user_controller);
     }
 
     listen(): void {
-        // let PORT: string | undefined = this.get_port();
-
         this.app.listen(config.PORT, () => {
             console.log(`Server is running in ${config.STAT} mode and listening on port ${config.PORT}...`);
         }).on('error', (err) => {
             console.log(err);
             process.exit(2);
         });
-    }
-
-    // get_port(): string | undefined {
-    //     if (process.env.STATUS == "production") {
-    //         return process.env.PROD_PORT;
-    //     } else if (process.env.STATUS == "development") {
-    //         return process.env.DEV_PORT;
-    //     } else {
-    //         console.log("please specify a status in .env file (STATUS = development or STATUS = production)");
-    //         process.exit(3);
-    //     }
-    // }
+    }    
 }
 
 const app = new App();

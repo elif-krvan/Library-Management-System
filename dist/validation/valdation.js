@@ -13,7 +13,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const joi_1 = __importDefault(require("joi"));
-const exception_1 = require("../common/exception");
 class Validation {
     constructor() {
         this.validate_joi = (schema) => {
@@ -56,16 +55,6 @@ class Validation {
             email: joi_1.default.string().email().required()
         });
         this.id_schema = joi_1.default.string().pattern(new RegExp("^[a-zA-Z0-9-]+$")).required();
-    }
-    validate(schema, value) {
-        return new Promise((resolve, reject) => {
-            schema.validateAsync(value).then(() => {
-                resolve(true);
-            })
-                .catch((err) => {
-                reject(new exception_1.WrongRequestExc(err.details[0].message));
-            });
-        });
     }
 }
 const validation = new Validation();

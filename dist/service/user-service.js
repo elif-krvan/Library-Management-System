@@ -8,7 +8,7 @@ class UserService {
     }
     create_user(user) {
         return new Promise((resolve, reject) => {
-            this.userRepo.create_user(user).then((new_user) => {
+            this.userRepo.add_new_user(user).then((new_user) => {
                 resolve(new_user);
             })
                 .catch((err) => {
@@ -16,6 +16,16 @@ class UserService {
             });
         });
     }
+    // create_user(user: User): Promise<User> {
+    //     return new Promise<User> ((resolve, reject) => {
+    //         this.userRepo.create_user(user).then((new_user) => {
+    //             resolve(new_user);
+    //         })
+    //         .catch((err) => {
+    //             reject(err);
+    //         })
+    //     });
+    // }
     get_user(user_id) {
         return new Promise((resolve, reject) => {
             this.userRepo.get_user(user_id).then((user) => {

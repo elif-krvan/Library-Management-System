@@ -8,8 +8,10 @@ const express_1 = __importDefault(require("express"));
 const body_parser_1 = __importDefault(require("body-parser"));
 const user_controller_1 = __importDefault(require("./controller/user-controller"));
 const constrants_1 = require("./constants/constrants");
-const dotenv_1 = __importDefault(require("dotenv"));
-const path_1 = __importDefault(require("path"));
+// import dotenv from 'dotenv';
+// import path from "path";
+const config_1 = __importDefault(require("./config"));
+const db_1 = __importDefault(require("./db/db"));
 class App {
     constructor() {
         this.app = (0, express_1.default)();
@@ -18,12 +20,9 @@ class App {
     init() {
         return new Promise((resolve, reject) => {
             try {
-                this.app.use(body_parser_1.default.json());
-                this.app.use(body_parser_1.default.urlencoded({ extended: false }));
-                this.app.use(constrants_1.Const.ROUTE_EMPTY, this.appRouter);
-                this.appRouter.use(constrants_1.Const.ROUTE_USER, user_controller_1.default);
-                // dotenv.config({path: path.resolve(__dirname, "config/.env")});
-                console.log(dotenv_1.default.config({ path: path_1.default.resolve(".env") }));
+                db_1.default.start();
+                this.load_config();
+                this.load_router();
             }
             catch (error) {
                 console.log(error);
@@ -34,26 +33,21 @@ class App {
             }
         });
     }
+    load_config() {
+        this.app.use(body_parser_1.default.json());
+        this.app.use(body_parser_1.default.urlencoded({ extended: false }));
+    }
+    load_router() {
+        this.app.use(constrants_1.Const.ROUTE_EMPTY, this.appRouter);
+        this.appRouter.use(constrants_1.Const.ROUTE_USER, user_controller_1.default);
+    }
     listen() {
-        let PORT = this.get_port();
-        this.app.listen(PORT, () => {
-            console.log(`Server is running in ${process.env.STATUS} mode and listening on port ${PORT}...`);
+        this.app.listen(config_1.default.PORT, () => {
+            console.log(`Server is running in ${config_1.default.STAT} mode and listening on port ${config_1.default.PORT}...`);
         }).on('error', (err) => {
             console.log(err);
             process.exit(2);
         });
-    }
-    get_port() {
-        if (process.env.STATUS == "production") {
-            return process.env.PROD_PORT;
-        }
-        else if (process.env.STATUS == "development") {
-            return process.env.DEV_PORT;
-        }
-        else {
-            console.log("please specify a status in .env file (STATUS = development or STATUS = production)");
-            process.exit(3);
-        }
     }
 }
 exports.App = App;
