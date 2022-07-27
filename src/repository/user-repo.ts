@@ -4,11 +4,6 @@ import { DBExc, UserAlreadyExistExc, UserNotFoundExc } from "../common/exception
 import db from "../db/db";
 
 export class UserRepo {
-    private users: User[];
-
-    constructor() {
-        this.users = [];
-    }
     
     async add_new_user(user: User): Promise<User> {
         return new Promise(async (resolve, reject) => {
@@ -38,7 +33,7 @@ export class UserRepo {
             .catch((err) => {
                 console.log(err);
                 reject(new DBExc(err));
-            }); //too much catch            
+            }); //?            
         });        
     }
 
@@ -96,7 +91,7 @@ export class UserRepo {
             })
             .catch((err) => {
                 console.log(err);
-                reject(new DBExc(err)); //?
+                reject(new DBExc(err));
             });
         });
     }
