@@ -14,8 +14,8 @@ class ValidateBody {
 
     validate_add_user(user: User): Promise<WrongRequestExc | boolean> {
         return new Promise<WrongRequestExc | boolean> ((resolve, reject) => {
-            for ( let val of Object.values(user) ) {
-                if ( val == undefined || val == null ) {
+            for ( let value of Object.values(user) ) {
+                if ( value == undefined || value == null ) {
                     reject(new WrongRequestExc("undefined value"));
                 }
             }

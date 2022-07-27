@@ -13,7 +13,7 @@ class DB {
         }
     }
     
-    knx: Knex = knex(this.config);;
+    knx: Knex = knex(this.config);
     async start(): Promise<boolean> {
         return new Promise<boolean>(async (resolve, reject) => {
             console.log(`db connected on port ${config.PG_PORT} at ${config.PG_HOST} in ${config.STAT} mode`);
