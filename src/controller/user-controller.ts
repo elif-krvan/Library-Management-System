@@ -1,4 +1,5 @@
-import { Router, Request, Response } from 'express';
+import { Router, Request, Response, NextFunction } from 'express';
+import { nextTick } from 'process';
 import { Exception, ValidationExc } from '../common/exception';
 import { SuccessResponse } from '../common/success';
 import { FilterUser } from '../interface/i_filter';
@@ -27,7 +28,7 @@ class userController implements BaseRouter {
         this.router.delete("/:user_id", this.delete_user);
     }
 
-    private get_users = async (req: Request, res: Response) => {
+    private get_users = async (req: Request, res: Response, next: NextFunction) => {
         let pag: Pagination = {
             page: req.query.page as string,
             limit: req.query.limit as string
@@ -43,9 +44,6 @@ class userController implements BaseRouter {
             order: req.query.order as string
         }
 
-        console.log("query",req.query)
-        console.log("filter",filter)
-
         validation.peg_schema.validateAsync((pag)).then((val_pag: Pagination) => {
             validation.filter_user_schema.validateAsync((filter)).then((val_filter: FilterUser) => {
                 this.userService.get_users(val_pag, val_filter).then((users) => {
@@ -56,22 +54,21 @@ class userController implements BaseRouter {
                     res.json(succ_res);
                 })
                 .catch((err) => {
-                    console.log(err)
-                    res.status(500).json(new ValidationExc(err)); //edit
+                    next(err);
                 });
             })
             .catch((err) => {
-                console.log(err)
-                res.status(500).json(new ValidationExc(err)); //edit
+                const exc: Exception = new ValidationExc(err);
+                next(exc);
             });          
         })
         .catch((err) => {
-            console.log(err)
-            res.status(500).json(new ValidationExc(err)); //edit
+            const exc: Exception = new ValidationExc(err);
+            next(exc);
         });       
     }
 
-    private get_user_by_id = async (req: Request, res: Response) => {
+    private get_user_by_id = async (req: Request, res: Response, next: NextFunction) => {
         const id: string = req.params.user_id;
 
         validation.id_schema.validateAsync(id).then((validated: string) => {
@@ -84,16 +81,16 @@ class userController implements BaseRouter {
                 res.json(succ_res);
             })
             .catch((err) => {
-                res.status(err.status).status(err.status).json(err);
+                next(err);
             });
         })
         .catch((err) => {
             const exc: Exception = new ValidationExc(err);
-            res.status(exc.status).json(exc);
+            next(exc);
         });        
     }
 
-    private add_user = async (req: Request, res: Response) => {
+    private add_user = async (req: Request, res: Response, next: NextFunction) => {
         let new_user: User = {
             name: req.body.name,
             surname: req.body.surname,
@@ -111,15 +108,15 @@ class userController implements BaseRouter {
                 res.json(succ_res);
             })
             .catch((err) => {
-                res.status(err.status).json(err);
+                next(err);
             });
         })
         .catch((err) => {
-            res.status(err.status).json(err);
+            next(err);
         });
     }
 
-    private add_user_v2 = async (req: Request, res: Response) => {
+    private add_user_v2 = async (req: Request, res: Response, next: NextFunction) => {
         let new_user: User = {
             name: req.body.name,
             surname: req.body.surname,
@@ -137,16 +134,16 @@ class userController implements BaseRouter {
                 res.json(succ_res);
             })
             .catch((err) => {
-                res.status(err.status).json(err);
+                next(err);
             });
         })
         .catch((err) => {
             const exc: Exception = new ValidationExc(err);
-            res.status(exc.status).json(exc);
+            next(exc);
         });
     }
 
-    private delete_user = async (req: Request, res: Response) => {
+    private delete_user = async (req: Request, res: Response, next: NextFunction) => {
         // delete the user if it exists
         const id: string = req.params.user_id;
         validation.id_schema.validateAsync(id).then((validated: string) => {
@@ -158,12 +155,12 @@ class userController implements BaseRouter {
                 res.json(succ_res);
             })
             .catch((err) => { //user with parameter id does not exist
-                res.status(err.status).json(err);
+                next(err);
             });
         })
         .catch((err) => { //the parameter is in the wrong format or it does not exist
             const exc: Exception = new ValidationExc(err);
-            res.status(exc.status).json(exc);
+            next(exc);
         });
     }    
 }

@@ -15,7 +15,7 @@ class Validation {
 
                 const err_res: ErrorResponse = {
                     error: "wrong request content",
-                    result: "signup is not successful"
+                    message: "signup is not successful"
                 }
                 return res.status(400).json(err_res);
             }
@@ -33,7 +33,7 @@ class Validation {
 
                 const err_res: ErrorResponse = {
                     error: "wrong request content",
-                    result: "signup is not successful"
+                    message: "signup is not successful"
                 }
                 return res.status(400).json(err_res);
             }
@@ -67,7 +67,8 @@ class Validation {
         signup_date: Joi.date(),
         sort_by: Joi.string().valid("id", "user_id", "name", "surname", "age", "signup_date", "send_ads"),
         order: Joi.string().valid("asc", "desc")
-    });
+    })
+    .with("order", "sort_by");
 
     id_schema = Joi.string().pattern(new RegExp("^[a-zA-Z0-9-]+$")).required();
 }

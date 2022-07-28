@@ -2,7 +2,7 @@ import { User } from "../model/user";
 import { v4 as uuid } from 'uuid';
 import { DBExc, UserAlreadyExistExc, UserNotFoundExc } from "../common/exception";
 import db from "../db/db";
-import pegination from "../middleware/pagination";
+import pagination from "../middleware/pagination";
 import { FilterUser } from "../interface/i_filter";
 import { Pagination } from "../interface/i_pagination";
 
@@ -144,7 +144,7 @@ export class UserRepo {
 
                 if (peg.limit) {
                     queryBuilder.limit(peg.limit as number)
-                    .offset(pegination.find_offset(peg.limit as number, peg.page as number));
+                    .offset(pagination.find_offset(peg.limit as number, peg.page as number));
                 }
             })
             .then((result) => {

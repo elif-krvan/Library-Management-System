@@ -6,6 +6,7 @@ import { Const } from "./constants/constrants";
 // import path from "path";
 import config from "./config";
 import db from "./db/db";
+import error_middleware from "./middleware/error-middleware";
 
 export class App {
     private app: Application;
@@ -26,6 +27,7 @@ export class App {
                 console.log(error);
                 reject(false);
             } finally {
+                this.app.use(error_middleware);
                 resolve(true);
             }
         });              

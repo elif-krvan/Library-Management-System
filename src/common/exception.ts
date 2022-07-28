@@ -24,7 +24,7 @@ export class UserNotFoundExc extends Exception {
 export class UserAlreadyExistExc extends Exception {
     constructor(error?: string) {
         let err: string = error || "user with the same e-mail exists";
-        super(406, "user already exist", err);
+        super(406, "signup unsuccessful", err);
     }
 }
 
@@ -42,6 +42,6 @@ export class ValidationExc extends Exception {
 
 export class DBExc extends Exception {
     constructor(error?: any) {
-        super(407, "database error", error);
+        super(408, "database error", error);
     }
 }
