@@ -1,6 +1,7 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import { nextTick } from 'process';
 import { Exception, ValidationExc } from '../common/exception';
+import { UserFilterParams } from '../common/filter-params';
 import { SuccessResponse } from '../common/success';
 import { FilterUser } from '../interface/i_filter';
 import { Pagination } from '../interface/i_pagination';
@@ -41,10 +42,12 @@ class userController implements BaseRouter {
             order: req.query.order as string
         };
 
-        user_validation.filter_user_schema.validateAsync((user_filter)).then((validated_filter) => {
+        user_validation.user_list_filter_schema.validateAsync((user_filter)).then(async (validated_filter) => {
             let pag: Pagination = {
                 page: validated_filter.page,
-                limit: validated_filter.limit
+                limit: validated_filter.limit,
+                sort_by: validated_filter.sort_by,
+                order: validated_filter.order
             };
 
             let filter: FilterUser = {
@@ -53,11 +56,11 @@ class userController implements BaseRouter {
                 age: validated_filter.age,
                 signup_date: validated_filter.signup_date,
                 send_ads: validated_filter.send_ads,
-                sort_by: validated_filter.sort_by,
-                order: validated_filter.order
             };
 
-            this.userService.get_users(pag, filter).then((users) => {
+            let reduced_filter: UserFilterParams = (new UserFilterParams(filter)).get_filter();
+
+            await this.userService.get_users(pag, reduced_filter).then((users) => {
                 const succ_res: SuccessResponse = {
                     data: users,
                     message: 'ok'
@@ -69,6 +72,7 @@ class userController implements BaseRouter {
             });
         })
         .catch((err) => {
+            console.log(err)
             const exc: Exception = new ValidationExc(err);
             next(exc);
         });       

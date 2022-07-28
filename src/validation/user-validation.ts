@@ -56,9 +56,12 @@ class Validation {
         signup_date: Joi.date(),
         sort_by: Joi.string().valid("id", "user_id", "name", "surname", "age", "signup_date", "send_ads"),
         order: Joi.string().valid("asc", "desc"),
-        page: Joi.number().min(1).required().when("limit", {is: Joi.exist(), then: Joi.required(), otherwise: Joi.forbidden()}),
-        limit: Joi.number().min(1).required().when("page", {is: Joi.exist(), then: Joi.required(), otherwise: Joi.forbidden()})
+        page: Joi.number().min(1),
+        // .when("limit", {is: Joi.exist(), then: Joi.required(), otherwise: Joi.forbidden()}),
+        limit: Joi.number().min(1)
     })
+    .with("limit", "page")
+    .with("page", "limit")
     .with("order", "sort_by");
 
     peg_schema = Joi.alternatives().try(

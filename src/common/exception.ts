@@ -11,7 +11,7 @@ export class Exception extends Error {
         this.status = status;
         this.data = data;
         this.message = message;
-        this.error = error;
+        this.error = error;//fix
     }
 }
 

@@ -5,6 +5,7 @@ import db from "../db/db";
 import pagination from "../middleware/pagination";
 import { FilterUser } from "../interface/i_filter";
 import { Pagination } from "../interface/i_pagination";
+import { UserFilterParams } from "../common/filter-params";
 
 export class UserRepo {
     
@@ -98,22 +99,7 @@ export class UserRepo {
         });
     }
 
-    // async get_users(): Promise<User[]> {
-    //     return new Promise<User[]> (async (resolve, reject) => {
-    //         await db.knx("user")
-    //         .select("*")
-    //         .then((result) => {
-    //             console.log("type", typeof result);
-    //             resolve(result)
-    //         })
-    //         .catch((err) => {
-    //             console.log(err);
-    //             reject(new DBExc(err));
-    //         }); 
-    //     });
-    // }
-
-    async get_users(peg: Pagination, filter: FilterUser): Promise<User[]> {
+    async get_users(pag: Pagination, filter: any): Promise<User[]> { //?
         return new Promise<User[]> (async (resolve, reject) => {
             await db.knx("user")
             .select("*")
@@ -134,17 +120,17 @@ export class UserRepo {
                     queryBuilder.where("send_ads", filter.send_ads);
                 }
 
-                if (filter.signup_date) { //?
+                if (filter.signup_date) { //? fix this!!!!
                     queryBuilder.where("signup_date", filter.signup_date);
                 }
 
-                if (filter.sort_by) {
-                    queryBuilder.orderBy(filter.sort_by, filter.order || "asc");
+                if (pag.sort_by) {
+                    queryBuilder.orderBy(pag.sort_by, pag.order || "asc");
                 }
 
-                if (peg.limit) {
-                    queryBuilder.limit(peg.limit as number)
-                    .offset(pagination.find_offset(peg.limit as number, peg.page as number));
+                if (pag.limit) {
+                    queryBuilder.limit(pag.limit as number)
+                    .offset(pagination.find_offset(pag.limit as number, pag.page as number));
                 }
             })
             .then((result) => {
