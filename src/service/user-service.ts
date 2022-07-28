@@ -1,5 +1,6 @@
 import { UserAlreadyExistExc } from "../common/exception";
 import { UserFilterParams } from "../common/filter-params";
+import { UserListResponse } from "../common/success-response";
 import { FilterUser } from "../interface/i_filter";
 import { Pagination } from "../interface/i_pagination";
 import { User } from "../model/user";
@@ -43,8 +44,8 @@ export class UserService {
         });
     }
 
-    get_users(peg: Pagination, filter: any): Promise<User[]> {
-        return new Promise<User[]> ((resolve, reject) => {
+    get_users(peg: Pagination, filter: any): Promise<UserListResponse> {
+        return new Promise<UserListResponse> ((resolve, reject) => {
             this.userRepo.get_users(peg, filter).then((users) => {
                 resolve(users);
             })

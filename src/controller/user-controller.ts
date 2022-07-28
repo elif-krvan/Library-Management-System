@@ -60,12 +60,8 @@ class userController implements BaseRouter {
 
             let reduced_filter: UserFilterParams = (new UserFilterParams(filter)).get_filter();
 
-            await this.userService.get_users(pag, reduced_filter).then((users) => {
-                const succ_res: SuccessResponse = {
-                    data: users,
-                    message: 'ok'
-                }
-                res.json(succ_res);
+            await this.userService.get_users(pag, reduced_filter).then((data) => {
+                res.json(data);
             })
             .catch((err) => {
                 next(err);

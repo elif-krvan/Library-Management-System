@@ -6,6 +6,8 @@ import pagination from "../middleware/pagination";
 import { FilterUser } from "../interface/i_filter";
 import { Pagination } from "../interface/i_pagination";
 import { UserFilterParams } from "../common/filter-params";
+import knex from "knex";
+import { UserListResponse } from "../common/success-response";
 
 export class UserRepo {
     
@@ -99,8 +101,8 @@ export class UserRepo {
         });
     }
 
-    async get_users(pag: Pagination, filter: any): Promise<User[]> { //?
-        return new Promise<User[]> (async (resolve, reject) => {
+    async get_users(pag: Pagination, filter: any): Promise<UserListResponse> { //?
+        return new Promise<UserListResponse> (async (resolve, reject) => {
             await db.knx("user")
             .select("*")
             .modify((queryBuilder) => {
@@ -134,7 +136,10 @@ export class UserRepo {
                 }
             })
             .then((result) => {
-                resolve(result)
+                db.knx("user").count("id as count").then((count_result) => {
+                    resolve(new UserListResponse("OK", count_result[0].count as number, result));
+                })
+                
             })
             .catch((err) => {
                 console.log(err);
