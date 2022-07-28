@@ -17,7 +17,7 @@ class DB {
     mig_config: Knex.MigratorConfig = {
         directory: "./src/db/migrations",
         tableName: "knex_migrations"
-    } //?
+    }
     
     knx: Knex = knex(this.config);
 
@@ -31,7 +31,7 @@ class DB {
                 await this.knx.raw('SELECT now()')
                 .catch((err) => {
                     console.log(err);
-                    reject(new Error('Unable to connect to Postgres via Knex. Ensure a valid connection.'));
+                    reject(new Error('unable to connect to Postgres via Knex, please ensure a valid connection.'));
                 })
                 .finally(() => {
                     console.log(`db connected on port ${config.PG_PORT} at ${config.PG_HOST} in ${config.STAT} mode`);

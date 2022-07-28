@@ -15,8 +15,9 @@ export class Exception extends Error {
 }
 
 export class UserNotFoundExc extends Exception {
-    constructor() {
-        super(405, "user not found");
+    constructor(error?: string) {
+        let err: string = error || "no matching id";
+        super(405, "user not found", err);
     }
 }
 

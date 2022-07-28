@@ -3,7 +3,7 @@ import db from "../db";
 
 
 export async function up(knex: Knex) {
-    return db.knx.schema.createTable("user", (table) => {
+    return knex.schema.createTable("user", (table) => {
         table.string("id").notNullable().primary();
         table.string("name").notNullable();
         table.string("surname").notNullable();
@@ -16,6 +16,5 @@ export async function up(knex: Knex) {
 
 
 export async function down(knex: Knex): Promise<void> {
-    return db.knx.schema.dropTable("user");
+    return knex.schema.dropTable("user");
 }
-

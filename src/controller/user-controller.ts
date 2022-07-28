@@ -1,7 +1,8 @@
-import { resolveSoa } from 'dns';
 import { Router, Request, Response } from 'express';
 import { Exception, ValidationExc } from '../common/exception';
 import { SuccessResponse } from '../common/success';
+import { FilterUser } from '../interface/i_filter';
+import { Pagination } from '../interface/i_pagination';
 import { User } from '../model/user';
 import { UserService } from '../service/user-service';
 import validation from '../validation/valdation';
@@ -27,15 +28,46 @@ class userController implements BaseRouter {
     }
 
     private get_users = async (req: Request, res: Response) => {
-        this.userService.get_users().then((users) => {
-            const succ_res: SuccessResponse = {
-                data: users,
-                message: 'ok'
-            }
-            res.json(succ_res);
+        let pag: Pagination = {
+            page: req.query.page as string,
+            limit: req.query.limit as string
+        }
+
+        let filter: FilterUser = {
+            name: req.query.name as string,
+            surname: req.query.surname as string,
+            age: req.query.age as string,
+            signup_date: req.query.signup_date as string,
+            send_ads: req.query.send_ads as string,
+            sort_by: req.query.sort_by as string,
+            order: req.query.order as string
+        }
+
+        console.log("query",req.query)
+        console.log("filter",filter)
+
+        validation.peg_schema.validateAsync((pag)).then((val_pag: Pagination) => {
+            validation.filter_user_schema.validateAsync((filter)).then((val_filter: FilterUser) => {
+                this.userService.get_users(val_pag, val_filter).then((users) => {
+                    const succ_res: SuccessResponse = {
+                        data: users,
+                        message: 'ok'
+                    }
+                    res.json(succ_res);
+                })
+                .catch((err) => {
+                    console.log(err)
+                    res.status(500).json(new ValidationExc(err)); //edit
+                });
+            })
+            .catch((err) => {
+                console.log(err)
+                res.status(500).json(new ValidationExc(err)); //edit
+            });          
         })
         .catch((err) => {
-            res.status(err.status).json(new ValidationExc(err));
+            console.log(err)
+            res.status(500).json(new ValidationExc(err)); //edit
         });       
     }
 
@@ -43,7 +75,6 @@ class userController implements BaseRouter {
         const id: string = req.params.user_id;
 
         validation.id_schema.validateAsync(id).then((validated: string) => {
-            validated
             this.userService.get_user(validated).then((user) => {
                 
                 const succ_res: SuccessResponse = {
@@ -63,8 +94,6 @@ class userController implements BaseRouter {
     }
 
     private add_user = async (req: Request, res: Response) => {
-        console.log(req.body)
-        // console.log(req)
         let new_user: User = {
             name: req.body.name,
             surname: req.body.surname,
