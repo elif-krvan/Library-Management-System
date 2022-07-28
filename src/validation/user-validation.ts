@@ -48,14 +48,27 @@ class Validation {
         email: Joi.string().email().required()
     });
 
+    user_list_filter_schema = Joi.object({
+        name: Joi.string().min(3).max(50).pattern(new RegExp('^[a-zA-Z]')),
+        surname: Joi.string().min(3).max(50).pattern(new RegExp('^[a-zA-Z]')),
+        age: Joi.number().min(18),
+        send_ads: Joi.boolean(),
+        signup_date: Joi.date(),
+        sort_by: Joi.string().valid("id", "user_id", "name", "surname", "age", "signup_date", "send_ads"),
+        order: Joi.string().valid("asc", "desc"),
+        page: Joi.number().min(1).required().when("limit", {is: Joi.exist(), then: Joi.required(), otherwise: Joi.forbidden()}),
+        limit: Joi.number().min(1).required().when("page", {is: Joi.exist(), then: Joi.required(), otherwise: Joi.forbidden()})
+    })
+    .with("order", "sort_by");
+
     peg_schema = Joi.alternatives().try(
         Joi.object({
             page: Joi.number().min(1).required(),
             limit: Joi.number().min(1).required()
         }),
         Joi.object({
-            page: Joi.valid(null, '', NaN),
-            limit: Joi.valid(null, '', NaN)
+            page: Joi.forbidden(),
+            limit: Joi.forbidden()
         })
     )
 
@@ -73,5 +86,5 @@ class Validation {
     id_schema = Joi.string().pattern(new RegExp("^[a-zA-Z0-9-]+$")).required();
 }
 
-const validation = new Validation();
-export default validation;
+const user_validation = new Validation();
+export default user_validation;

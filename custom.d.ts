@@ -1,7 +1,7 @@
 declare global {
-    namespace Express {
-      interface Response {
-        paginated: object
-      }
+  namespace Express {
+    interface Response {
+      paginated: object
     }
   }
+}

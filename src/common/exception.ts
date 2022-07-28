@@ -3,6 +3,7 @@ export class Exception extends Error {
     data?: any;
     message: string;
     error?: string;
+    validation_error?: string[];
 
     constructor(status: number, message: string, error?: string, data?: any) {
         super();
@@ -29,13 +30,13 @@ export class UserAlreadyExistExc extends Exception {
 }
 
 export class WrongRequestExc extends Exception {
-    constructor(error?: string) {
+    constructor(error: string) {
         super(407, "wrong request content", error);
     }
 }
 
 export class ValidationExc extends Exception {
-    constructor(error?: any) {
+    constructor(error: any) {
         super(407, "wrong request content", error.details[0].message);
     }
 }

@@ -27,7 +27,7 @@ export class App {
                 console.log(error);
                 reject(false);
             } finally {
-                this.app.use(error_middleware);
+                this.app.use(error_middleware);//
                 resolve(true);
             }
         });              

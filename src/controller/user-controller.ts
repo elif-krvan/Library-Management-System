@@ -6,7 +6,7 @@ import { FilterUser } from '../interface/i_filter';
 import { Pagination } from '../interface/i_pagination';
 import { User } from '../model/user';
 import { UserService } from '../service/user-service';
-import validation from '../validation/valdation';
+import user_validation from '../validation/user-validation';
 import validate_body from '../validation/validate-body';
 import BaseRouter from './base-router';
 
@@ -29,12 +29,9 @@ class userController implements BaseRouter {
     }
 
     private get_users = async (req: Request, res: Response, next: NextFunction) => {
-        let pag: Pagination = {
+        let user_filter = {
             page: req.query.page as string,
-            limit: req.query.limit as string
-        }
-
-        let filter: FilterUser = {
+            limit: req.query.limit as string,
             name: req.query.name as string,
             surname: req.query.surname as string,
             age: req.query.age as string,
@@ -42,25 +39,34 @@ class userController implements BaseRouter {
             send_ads: req.query.send_ads as string,
             sort_by: req.query.sort_by as string,
             order: req.query.order as string
-        }
+        };
 
-        validation.peg_schema.validateAsync((pag)).then((val_pag: Pagination) => {
-            validation.filter_user_schema.validateAsync((filter)).then((val_filter: FilterUser) => {
-                this.userService.get_users(val_pag, val_filter).then((users) => {
-                    const succ_res: SuccessResponse = {
-                        data: users,
-                        message: 'ok'
-                    }
-                    res.json(succ_res);
-                })
-                .catch((err) => {
-                    next(err);
-                });
+        user_validation.filter_user_schema.validateAsync((user_filter)).then((validated_filter) => {
+            let pag: Pagination = {
+                page: validated_filter.page,
+                limit: validated_filter.limit
+            };
+
+            let filter: FilterUser = {
+                name: validated_filter.name,
+                surname: validated_filter.surname,
+                age: validated_filter.age,
+                signup_date: validated_filter.signup_date,
+                send_ads: validated_filter.send_ads,
+                sort_by: validated_filter.sort_by,
+                order: validated_filter.order
+            };
+
+            this.userService.get_users(pag, filter).then((users) => {
+                const succ_res: SuccessResponse = {
+                    data: users,
+                    message: 'ok'
+                }
+                res.json(succ_res);
             })
             .catch((err) => {
-                const exc: Exception = new ValidationExc(err);
-                next(exc);
-            });          
+                next(err);
+            });
         })
         .catch((err) => {
             const exc: Exception = new ValidationExc(err);
@@ -71,7 +77,7 @@ class userController implements BaseRouter {
     private get_user_by_id = async (req: Request, res: Response, next: NextFunction) => {
         const id: string = req.params.user_id;
 
-        validation.id_schema.validateAsync(id).then((validated: string) => {
+        user_validation.id_schema.validateAsync(id).then((validated: string) => {
             this.userService.get_user(validated).then((user) => {
                 
                 const succ_res: SuccessResponse = {
@@ -125,7 +131,7 @@ class userController implements BaseRouter {
             email: req.body.email
         }
 
-        validation.user_schema.validateAsync(new_user).then((validated) => {
+        user_validation.user_schema.validateAsync(new_user).then((validated) => {
             this.userService.create_user(validated).then((new_user) => {
                 const succ_res: SuccessResponse = {
                     data: new_user,
@@ -146,7 +152,7 @@ class userController implements BaseRouter {
     private delete_user = async (req: Request, res: Response, next: NextFunction) => {
         // delete the user if it exists
         const id: string = req.params.user_id;
-        validation.id_schema.validateAsync(id).then((validated: string) => {
+        user_validation.id_schema.validateAsync(id).then((validated: string) => {
             this.userService.delete_user(validated).then((deleted_user) => {
                 const succ_res: SuccessResponse = {
                     data: deleted_user,
