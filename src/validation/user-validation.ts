@@ -3,50 +3,15 @@ import Joi, { ObjectSchema } from "joi";
 import { ErrorResponse } from "../common/error";
 
 class Validation {
-    
-    validate_joi = (schema: ObjectSchema) => {
-        return async (req: Request, res: Response, next: NextFunction) => {
-            try {
-                await schema.validateAsync(req.body);
-                
-                next();
-            } catch (err) {
-                console.log(err);
-
-                const err_res: ErrorResponse = {
-                    error: "wrong request content",
-                    message: "signup is not successful"
-                }
-                return res.status(400).json(err_res);
-            }
-        };
-    };
-
-    validate_joi_param = (schema: ObjectSchema) => {
-        return async (req: Request, res: Response, next: NextFunction) => {
-            try {
-                await schema.validateAsync(req.params);
-                
-                next();
-            } catch (err) {
-                console.log(err);
-
-                const err_res: ErrorResponse = {
-                    error: "wrong request content",
-                    message: "signup is not successful"
-                }
-                return res.status(400).json(err_res);
-            }
-        };
-    };
-
     user_schema = Joi.object({
         name: Joi.string().min(3).max(50).pattern(new RegExp('^[a-zA-Z]')).required(),
         surname: Joi.string().min(3).max(50).pattern(new RegExp('^[a-zA-Z]')).required(),
         age: Joi.number().min(18).required(),
         send_ads: Joi.boolean().required(),
-        email: Joi.string().email().required()
-    });
+        email: Joi.string().email().required(),
+        password: Joi.string().min(5).required() //edit
+    })
+    .options({ abortEarly: false });
 
     user_list_filter_schema = Joi.object({
         name: Joi.string().min(3).max(50).pattern(new RegExp('^[a-zA-Z]')),

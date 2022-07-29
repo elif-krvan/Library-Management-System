@@ -6,4 +6,5 @@ export interface User {
     signup_date?: Date | string;
     send_ads: boolean;
     email: string;
+    password: string;
 }
