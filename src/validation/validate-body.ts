@@ -9,7 +9,8 @@ class ValidateBody {
         surname: "",
         age: 0,
         send_ads: false,
-        email: ""
+        email: "",
+        password: ""
     }
 
     validate_add_user(user: User): Promise<WrongRequestExc | boolean> {
@@ -20,7 +21,7 @@ class ValidateBody {
                 }
             }
     
-            const {name, surname, age, send_ads, email} = user;
+            const {name, surname, age, send_ads, email, password} = user;
     
             if (typeof name != typeof this.UserReq.name || name.length > 50) {
                 reject(new WrongRequestExc("name type is not string or it exceeds the 50 char limit"))
@@ -46,6 +47,10 @@ class ValidateBody {
 
             if (!reg_exp.test(email)) {
                 reject(new WrongRequestExc("not a valid email"))
+            }
+
+            if (typeof password != typeof this.UserReq.password || password.length < 5) {
+                reject(new WrongRequestExc("password type is not string or its length is less than 5"))
             }
             
             resolve(true);        
