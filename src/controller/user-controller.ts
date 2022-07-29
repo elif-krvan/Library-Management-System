@@ -5,6 +5,7 @@ import { UserFilterParams } from '../common/filter-params';
 import { SuccessResponse } from '../common/success';
 import { FilterUser } from '../interface/i_filter';
 import { Pagination } from '../interface/i_pagination';
+import pagination_middleware from '../middleware/pagination-middleware';
 import { User } from '../model/user';
 import { UserService } from '../service/user-service';
 import user_validation from '../validation/user-validation';
@@ -22,7 +23,7 @@ class userController implements BaseRouter {
     }
     
     init_controller(): void {
-        this.router.get("/", this.get_users);
+        this.router.get("/", pagination_middleware, this.get_users);
         this.router.get("/:user_id", this.get_user_by_id);
         this.router.post("/", this.add_user);
         this.router.post("/v2", this.add_user_v2);
@@ -30,37 +31,27 @@ class userController implements BaseRouter {
     }
 
     private get_users = async (req: Request, res: Response, next: NextFunction) => {
-        let user_filter = {
-            page: req.query.page as string,
-            limit: req.query.limit as string,
+        let user_filter: FilterUser = {
             name: req.query.name as string,
             surname: req.query.surname as string,
             age: req.query.age as string,
             signup_date: req.query.signup_date as string,
-            send_ads: req.query.send_ads as string,
-            sort_by: req.query.sort_by as string,
-            order: req.query.order as string
+            send_ads: req.query.send_ads as string
         };
 
-        user_validation.user_list_filter_schema.validateAsync((user_filter)).then(async (validated_filter) => {
-            let pag: Pagination = {
-                page: validated_filter.page,
-                limit: validated_filter.limit,
-                sort_by: validated_filter.sort_by,
-                order: validated_filter.order
-            };
+        user_validation.filter_user_schema.validateAsync((user_filter)).then(async (validated_filter: FilterUser) => {
 
-            let filter: FilterUser = {
-                name: validated_filter.name,
-                surname: validated_filter.surname,
-                age: validated_filter.age,
-                signup_date: validated_filter.signup_date,
-                send_ads: validated_filter.send_ads,
-            };
+            // let filter: FilterUser = {
+            //     name: validated_filter.name,
+            //     surname: validated_filter.surname,
+            //     age: validated_filter.age,
+            //     signup_date: validated_filter.signup_date,
+            //     send_ads: validated_filter.send_ads,
+            // };
 
-            let reduced_filter: UserFilterParams = (new UserFilterParams(filter)).get_filter();
+            let reduced_filter: UserFilterParams = (new UserFilterParams(validated_filter)).get_filter();
 
-            await this.userService.get_users(pag, reduced_filter).then((data) => {
+            await this.userService.get_users(req.pag_option, reduced_filter).then((data) => {
                 res.json(data);
             })
             .catch((err) => {

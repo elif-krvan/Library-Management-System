@@ -1,7 +1,7 @@
 {
   "name": "project_v2",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "boot.ts",
   "scripts": {
     "start": "node dist/boot.js",
     "dev": "nodemon src/boot.ts",

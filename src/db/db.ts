@@ -1,6 +1,6 @@
 import knex, { Knex } from "knex";
 import { DBExc } from "../common/exception";
-import config from "../config";
+import config from "../config/config";
 
 class DB {  
     config: Knex.Config = {

@@ -2,12 +2,12 @@ import { User } from "../model/user";
 import { v4 as uuid } from 'uuid';
 import { DBExc, UserAlreadyExistExc, UserNotFoundExc } from "../common/exception";
 import db from "../db/db";
-import pagination from "../middleware/pagination";
 import { FilterUser } from "../interface/i_filter";
 import { Pagination } from "../interface/i_pagination";
 import { UserFilterParams } from "../common/filter-params";
 import knex from "knex";
 import { UserListResponse } from "../common/success-response";
+import { PaginationOptions } from "../common/pagination-options";
 
 export class UserRepo {
     
@@ -101,7 +101,7 @@ export class UserRepo {
         });
     }
 
-    async get_users(pag: Pagination, filter: any): Promise<UserListResponse> { //?
+    async get_users(pag: PaginationOptions, filter: any): Promise<UserListResponse> { //?
         return new Promise<UserListResponse> (async (resolve, reject) => {
             await db.knx("user")
             .select("*")
@@ -132,7 +132,7 @@ export class UserRepo {
 
                 if (pag.limit) {
                     queryBuilder.limit(pag.limit as number)
-                    .offset(pagination.find_offset(pag.limit as number, pag.page as number));
+                    .offset(pag.skip);
                 }
             })
             .then((result) => {

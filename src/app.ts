@@ -2,11 +2,9 @@ import express, { Application } from "express"
 import bodyparser from 'body-parser';
 import user_controller from './controller/user-controller';
 import { Const } from "./constants/constrants";
-// import dotenv from 'dotenv';
-// import path from "path";
-import config from "./config";
 import db from "./db/db";
 import error_middleware from "./middleware/error-middleware";
+import config from "./config/config";
 
 export class App {
     private app: Application;

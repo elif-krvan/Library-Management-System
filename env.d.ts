@@ -9,8 +9,7 @@ declare global {
             PG_PORT: string,
             PG_USER: string,
             PG_PASS: string,
-            PG_DB: string
-            
+            PG_DB: string            
         }
     }
 }
