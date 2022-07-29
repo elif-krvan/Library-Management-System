@@ -22,7 +22,7 @@ export class FilterParams {
 }
 
 export class UserFilterParams extends FilterParams {
-    constructor(params: FilterUser) { // or any?
+    constructor(params: FilterUser) {
         super(params);
     }
 }

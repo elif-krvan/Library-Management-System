@@ -3,7 +3,7 @@ export interface User {
     name: string;
     surname: string;
     age: number;
-    signup_date?: Date;
+    signup_date?: Date | string;
     send_ads: boolean;
     email: string;
 }

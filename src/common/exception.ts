@@ -2,7 +2,7 @@ export class Exception extends Error {
     status: number;
     data?: any;
     message: string;
-    error?: string;
+    error?: any;
     validation_error?: string[];
 
     constructor(status: number, message: string, error?: string, data?: any) {
@@ -37,7 +37,7 @@ export class WrongRequestExc extends Exception {
 
 export class ValidationExc extends Exception {
     constructor(error: any) {
-        super(407, "wrong request content", error.details[0].message);
+        super(407, "wrong request content", error);
     }
 }
 

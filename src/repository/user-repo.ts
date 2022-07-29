@@ -1,20 +1,19 @@
 import { User } from "../model/user";
 import { v4 as uuid } from 'uuid';
-import { DBExc, UserAlreadyExistExc, UserNotFoundExc } from "../common/exception";
+import { DBExc, UserNotFoundExc } from "../common/exception";
 import db from "../db/db";
-import { FilterUser } from "../interface/i_filter";
-import { Pagination } from "../interface/i_pagination";
-import { UserFilterParams } from "../common/filter-params";
-import knex from "knex";
 import { UserListResponse } from "../common/success-response";
 import { PaginationOptions } from "../common/pagination-options";
+import format_date from "../common/date-formatter";
 
 export class UserRepo {
     
     async add_new_user(user: User): Promise<User> {
         return new Promise(async (resolve, reject) => {
             user.user_id = uuid();
-            user.signup_date = new Date;
+            user.signup_date = format_date(new Date); //?
+            // user.signup_date = (new Date).toLocaleString("YYYY-mm-dd:", {timeZone: "Turkey"}); //?
+            console.log("date", user);
             
             await db.knx<User>("user")
             .insert(user)
@@ -122,8 +121,12 @@ export class UserRepo {
                     queryBuilder.where("send_ads", filter.send_ads);
                 }
 
-                if (filter.signup_date) { //? fix this!!!!
-                    queryBuilder.where("signup_date", filter.signup_date);
+                if (filter.signup_date_start) { //? fix this!!!!                   
+                    queryBuilder.where("signup_date", ">=", filter.signup_date_start);
+                }
+
+                if (filter.signup_date_end) { //? fix this!!!!
+                    queryBuilder.where("signup_date", "<=", filter.signup_date_end)
                 }
 
                 if (pag.sort_by) {
@@ -139,7 +142,10 @@ export class UserRepo {
                 db.knx("user").count("id as count").then((count_result) => {
                     resolve(new UserListResponse("OK", count_result[0].count as number, result));
                 })
-                
+                .catch((err) => {
+                    console.log(err);
+                    reject(new DBExc(err));
+                });                
             })
             .catch((err) => {
                 console.log(err);

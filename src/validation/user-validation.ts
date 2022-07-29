@@ -74,13 +74,13 @@ class Validation {
     .with("page", "limit")
     .with("limit", "page");
     
-
     filter_user_schema = Joi.object({
         name: Joi.string().min(3).max(50).pattern(new RegExp('^[a-zA-Z]')),
         surname: Joi.string().min(3).max(50).pattern(new RegExp('^[a-zA-Z]')),
         age: Joi.number().min(18),
         send_ads: Joi.boolean(),
-        signup_date: Joi.date()
+        signup_date_start: Joi.date(),
+        signup_date_end: Joi.date()
     });
 
     id_schema = Joi.string().pattern(new RegExp("^[a-zA-Z0-9-]+$")).required();

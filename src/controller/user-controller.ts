@@ -1,10 +1,8 @@
 import { Router, Request, Response, NextFunction } from 'express';
-import { nextTick } from 'process';
 import { Exception, ValidationExc } from '../common/exception';
 import { UserFilterParams } from '../common/filter-params';
 import { SuccessResponse } from '../common/success';
 import { FilterUser } from '../interface/i_filter';
-import { Pagination } from '../interface/i_pagination';
 import pagination_middleware from '../middleware/pagination-middleware';
 import { User } from '../model/user';
 import { UserService } from '../service/user-service';
@@ -35,20 +33,12 @@ class userController implements BaseRouter {
             name: req.query.name as string,
             surname: req.query.surname as string,
             age: req.query.age as string,
-            signup_date: req.query.signup_date as string,
+            signup_date_start: req.query.signup_date_start as string,
+            signup_date_end: req.query.signup_date_end as string,
             send_ads: req.query.send_ads as string
         };
 
         user_validation.filter_user_schema.validateAsync((user_filter)).then(async (validated_filter: FilterUser) => {
-
-            // let filter: FilterUser = {
-            //     name: validated_filter.name,
-            //     surname: validated_filter.surname,
-            //     age: validated_filter.age,
-            //     signup_date: validated_filter.signup_date,
-            //     send_ads: validated_filter.send_ads,
-            // };
-
             let reduced_filter: UserFilterParams = (new UserFilterParams(validated_filter)).get_filter();
 
             await this.userService.get_users(req.pag_option, reduced_filter).then((data) => {
@@ -121,7 +111,6 @@ class userController implements BaseRouter {
             send_ads: req.body.send_ads,
             email: req.body.email
         }
-
         user_validation.user_schema.validateAsync(new_user).then((validated) => {
             this.userService.create_user(validated).then((new_user) => {
                 const succ_res: SuccessResponse = {
