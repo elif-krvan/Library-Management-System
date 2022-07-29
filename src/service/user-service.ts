@@ -5,6 +5,7 @@ import { UserListResponse } from "../common/success-response";
 import { User } from "../model/user";
 import { UserRepo } from "../repository/user-repo";
 import bcrypt from 'bcrypt';
+import { FilterUser } from "../interface/i_filter";
 
 export class UserService {
     private userRepo: UserRepo;
@@ -50,9 +51,9 @@ export class UserService {
         });
     }
 
-    get_users(peg: PaginationOptions, filter: any): Promise<UserListResponse> {
+    get_users(filter: FilterUser): Promise<UserListResponse> {
         return new Promise<UserListResponse> ((resolve, reject) => {
-            this.userRepo.get_users(peg, filter).then((users) => {
+            this.userRepo.get_users(filter).then((users) => {
                 resolve(users);
             })
             .catch((err) => {

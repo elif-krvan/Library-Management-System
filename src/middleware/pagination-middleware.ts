@@ -1,8 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { Exception, ValidationExc } from '../common/exception';
 import ReqPagination, { PaginationOptions } from '../common/pagination-options';
-import { Pagination } from '../interface/i_pagination';
-import user_validation from '../validation/user-validation';
 
 function find_offset(limit: number, page: number): number {
     return (page) * limit; //page index starts from 0 //test

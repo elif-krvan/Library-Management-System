@@ -29,19 +29,23 @@ class userController implements BaseRouter {
     }
 
     private get_users = async (req: Request, res: Response, next: NextFunction) => {
-        let user_filter: FilterUser = {
+        let user_options = {
             name: req.query.name as string,
             surname: req.query.surname as string,
             age: req.query.age as string,
             signup_date_start: req.query.signup_date_start as string,
             signup_date_end: req.query.signup_date_end as string,
-            send_ads: req.query.send_ads as string
+            send_ads: req.query.send_ads as string,
+            order: req.pag_option.order,
+            sort_by: req.pag_option.sort_by,
+            limit: req.pag_option.limit,
+            skip: req.pag_option.skip
         };
 
-        user_validation.filter_user_schema.validateAsync((user_filter)).then(async (validated_filter: FilterUser) => {
-            let reduced_filter: UserFilterParams = (new UserFilterParams(validated_filter)).get_filter();
+        user_validation.user_list_filter_schema.validateAsync((user_options)).then(async (validated_filter) => {
+            let reduced_filter: FilterUser = (new UserFilterParams(validated_filter)).get_filter();
 
-            await this.userService.get_users(req.pag_option, reduced_filter).then((data) => {
+            await this.userService.get_users(reduced_filter).then((data) => {
                 res.json(data);
             })
             .catch((err) => {

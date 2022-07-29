@@ -5,6 +5,8 @@ import db from "../db/db";
 import { UserListResponse } from "../common/success-response";
 import { PaginationOptions } from "../common/pagination-options";
 import format_date from "../common/date-formatter";
+import { UserFilterParams } from "../common/filter-params";
+import { FilterUser } from "../interface/i_filter";
 
 export class UserRepo {
     
@@ -100,7 +102,7 @@ export class UserRepo {
         });
     }
 
-    async get_users(pag: PaginationOptions, filter: any): Promise<UserListResponse> { //?
+    async get_users(filter: FilterUser): Promise<UserListResponse> { //?
         return new Promise<UserListResponse> (async (resolve, reject) => {
             await db.knx("user")
             .select("*")
@@ -129,13 +131,13 @@ export class UserRepo {
                     queryBuilder.where("signup_date", "<=", filter.signup_date_end)
                 }
 
-                if (pag.sort_by) {
-                    queryBuilder.orderBy(pag.sort_by, pag.order || "asc");
+                if (filter.sort_by) {
+                    queryBuilder.orderBy(filter.sort_by, filter.order || "asc");
                 }
 
-                if (pag.limit) {
-                    queryBuilder.limit(pag.limit as number)
-                    .offset(pag.skip);
+                if (filter.limit) {
+                    queryBuilder.limit(filter.limit as number)
+                    .offset(filter.skip);
                 }
             })
             .then((result) => {
