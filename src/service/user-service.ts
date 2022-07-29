@@ -1,12 +1,10 @@
 import { UserAlreadyExistExc } from "../common/exception";
-import { UserFilterParams } from "../common/filter-params";
-import { PaginationOptions } from "../common/pagination-options";
-import { UserListResponse } from "../common/success-response";
 import { User } from "../model/user";
 import { UserRepo } from "../repository/user-repo";
 import bcrypt from 'bcrypt';
 import { FilterUser } from "../interface/i_filter";
 import config from "../config/config";
+import {ResponseSuccess } from "../common/response-success";
 
 export class UserService {
     private userRepo: UserRepo;
@@ -52,10 +50,10 @@ export class UserService {
         });
     }
 
-    get_users(filter: FilterUser): Promise<UserListResponse> {
-        return new Promise<UserListResponse> ((resolve, reject) => {
-            this.userRepo.get_users(filter).then((users) => {
-                resolve(users);
+    get_users(filter: FilterUser): Promise<ResponseSuccess> {
+        return new Promise<ResponseSuccess> ((resolve, reject) => {
+            this.userRepo.get_users(filter).then((data) => {
+                resolve(new ResponseSuccess("ok", data));
             })
             .catch((err) => {
                 reject(err);

@@ -2,11 +2,9 @@ import { User } from "../model/user";
 import { v4 as uuid } from 'uuid';
 import { DBExc, UserNotFoundExc } from "../common/exception";
 import db from "../db/db";
-import { UserListResponse } from "../common/success-response";
-import { PaginationOptions } from "../common/pagination-options";
 import format_date from "../common/date-formatter";
-import { UserFilterParams } from "../common/filter-params";
 import { FilterUser } from "../interface/i_filter";
+import { UserList } from "../interface/i-user-list";
 
 export class UserRepo {
     
@@ -102,10 +100,10 @@ export class UserRepo {
         });
     }
 
-    async get_users(filter: FilterUser): Promise<UserListResponse> { //?
-        return new Promise<UserListResponse> (async (resolve, reject) => {
+    async get_users(filter: FilterUser): Promise<UserList> { //?
+        return new Promise<UserList> (async (resolve, reject) => {
             await db.knx("user")
-            .select("*")
+            .select("*") //fix this no password info
             .modify((queryBuilder) => {
                 if (filter.name) {
                     queryBuilder.where("name", filter.name);
@@ -141,8 +139,9 @@ export class UserRepo {
                 }
             })
             .then((result) => {
-                db.knx("user").count("id as count").then((count_result) => {
-                    resolve(new UserListResponse("OK", count_result[0].count as number, result));
+                db.knx("user").count("id as count").then((count_result) => { //fix
+                    const data: UserList = { total_count: count_result[0].count as number, users: result};
+                    resolve(data);
                 })
                 .catch((err) => {
                     console.log(err);
