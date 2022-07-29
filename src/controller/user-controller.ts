@@ -83,7 +83,8 @@ class userController implements BaseRouter {
             surname: req.body.surname,
             age: req.body.age,
             send_ads: req.body.send_ads,
-            email: req.body.email
+            email: req.body.email,
+            password: req.body.password,
         }
 
         validate_body.validate_add_user(new_user).then(() => {
@@ -109,9 +110,11 @@ class userController implements BaseRouter {
             surname: req.body.surname,
             age: req.body.age,
             send_ads: req.body.send_ads,
-            email: req.body.email
+            email: req.body.email,
+            password: req.body.password,
         }
-        user_validation.user_schema.validateAsync(new_user).then((validated) => {
+
+        user_validation.user_schema.validateAsync(new_user).then((validated: User) => {
             this.userService.create_user(validated).then((new_user) => {
                 const succ_res: SuccessResponse = {
                     data: new_user,

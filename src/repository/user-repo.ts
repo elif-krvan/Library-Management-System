@@ -12,12 +12,12 @@ export class UserRepo {
         return new Promise(async (resolve, reject) => {
             user.user_id = uuid();
             user.signup_date = format_date(new Date); //?
-            // user.signup_date = (new Date).toLocaleString("YYYY-mm-dd:", {timeZone: "Turkey"}); //?
+            // user.signup_date = (new Date).toLocaleString("en-US", {timeZone: "Turkey"}); //?
             console.log("date", user);
             
-            await db.knx<User>("user")
+            await db.knx<User>("user") //seperate tables?
             .insert(user)
-            .returning("*")
+            .returning("*")// edit
             .then((new_user) => {
                 if (new_user[0]) {
                     resolve(new_user[0]); //add new user

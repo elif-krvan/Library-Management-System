@@ -2,10 +2,9 @@ import { UserAlreadyExistExc } from "../common/exception";
 import { UserFilterParams } from "../common/filter-params";
 import { PaginationOptions } from "../common/pagination-options";
 import { UserListResponse } from "../common/success-response";
-import { FilterUser } from "../interface/i_filter";
-import { Pagination } from "../interface/i_pagination";
 import { User } from "../model/user";
 import { UserRepo } from "../repository/user-repo";
+import bcrypt from 'bcrypt';
 
 export class UserService {
     private userRepo: UserRepo;
@@ -20,8 +19,14 @@ export class UserService {
                 if (exists) {
                     reject(new UserAlreadyExistExc("user email already exists"));
                 } else {
-                    this.userRepo.add_new_user(user).then((new_user) => {
-                        resolve(new_user);
+                    bcrypt.hash(user.password, 10).then((hash) => { //10?
+                        user.password = hash; //?
+                        this.userRepo.add_new_user(user).then((new_user) => {
+                            resolve(new_user);
+                        })
+                        .catch((err) => {
+                            reject(err);
+                        });
                     })
                     .catch((err) => {
                         reject(err);
