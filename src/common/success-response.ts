@@ -14,4 +14,4 @@ export class UserListResponse extends ResponseSuccess {
     constructor(msg: string, count: number, list: User[]) {
         super(msg, {count: count, users: list});
     }
-}
+}//remove
