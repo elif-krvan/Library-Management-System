@@ -17,7 +17,7 @@ export class UserRepo {
             // user.signup_date = (new Date).toLocaleString("en-US", {timeZone: "Turkey"}); //?
             console.log("date", user);
             
-            await db.knx<User>("user") //seperate tables?
+            await db.knx<User>("user")
             .insert(user)
             .returning("*")// edit
             .then((new_user) => {

@@ -25,8 +25,4 @@ export class UserFilterParams extends FilterParams {
     constructor(params: FilterUser) {
         super(params);
     }
-
-    // get_filter(): FilterUser {
-    //     return this.get_filter(); //check
-    // }
 }

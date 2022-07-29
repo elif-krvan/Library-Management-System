@@ -6,6 +6,7 @@ import { User } from "../model/user";
 import { UserRepo } from "../repository/user-repo";
 import bcrypt from 'bcrypt';
 import { FilterUser } from "../interface/i_filter";
+import config from "../config/config";
 
 export class UserService {
     private userRepo: UserRepo;
@@ -20,8 +21,8 @@ export class UserService {
                 if (exists) {
                     reject(new UserAlreadyExistExc("user email already exists"));
                 } else {
-                    bcrypt.hash(user.password, 10).then((hash) => { //10?
-                        user.password = hash; //?
+                    bcrypt.hash(user.password, config.SALT_LENGTH).then((hash) => {
+                        user.password = hash;
                         this.userRepo.add_new_user(user).then((new_user) => {
                             resolve(new_user);
                         })
