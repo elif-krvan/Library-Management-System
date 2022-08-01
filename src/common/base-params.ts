@@ -1,5 +1,3 @@
-import { FilterUser } from "../interface/i_filter";
-
 export class FilterParams {
     private params: any;
 

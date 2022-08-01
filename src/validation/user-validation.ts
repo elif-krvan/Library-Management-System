@@ -23,12 +23,12 @@ class Validation {
         sort_by: Joi.string().valid("id", "user_id", "name", "surname", "age", "signup_date", "send_ads"),
         order: Joi.string().valid("asc", "desc"),
         skip: Joi.number().min(0),
-        // .when("limit", {is: Joi.exist(), then: Joi.required(), otherwise: Joi.forbidden()}),
         limit: Joi.number().min(1)
     })
     .with("limit", "skip")
     .with("skip", "limit")
-    .with("order", "sort_by");
+    .with("order", "sort_by")
+    .options({ abortEarly: false });
 
     pag_schema = Joi.object({
         page: Joi.number().min(1),
@@ -38,7 +38,8 @@ class Validation {
     })
     .with("order", "sort_by")
     .with("page", "limit")
-    .with("limit", "page");
+    .with("limit", "page")
+    .options({ abortEarly: false });
     
     filter_user_schema = Joi.object({
         name: Joi.string().min(3).max(50).pattern(new RegExp('^[a-zA-Z]')),
@@ -47,7 +48,8 @@ class Validation {
         send_ads: Joi.boolean(),
         signup_date_start: Joi.date(),
         signup_date_end: Joi.date()
-    });
+    })
+    .options({ abortEarly: false });
 
     id_schema = Joi.string().pattern(new RegExp("^[a-zA-Z0-9-]+$")).required();
 }

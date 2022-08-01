@@ -1,6 +1,7 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import { Exception, ValidationExc } from '../common/exception';
 import { UserFilterParams } from '../common/filter-params';
+import { PaginationOptions } from '../common/pagination-options';
 import { SuccessResponse } from '../common/success';
 import { FilterUser } from '../interface/i_filter';
 import pagination_middleware from '../middleware/pagination-middleware';
@@ -29,23 +30,32 @@ class userController implements BaseRouter {
     }
 
     private get_users = async (req: Request, res: Response, next: NextFunction) => {
-        let user_options = {
+        const user_options = {
+            ...req.pag_option,
             name: req.query.name as string,
             surname: req.query.surname as string,
             age: req.query.age as string,
             signup_date_start: req.query.signup_date_start as string,
             signup_date_end: req.query.signup_date_end as string,
-            send_ads: req.query.send_ads as string,
-            order: req.pag_option.order,
-            sort_by: req.pag_option.sort_by,
-            limit: req.pag_option.limit,
-            skip: req.pag_option.skip
+            send_ads: req.query.send_ads as string
         };
 
+        console.log(user_options);
         user_validation.user_list_filter_schema.validateAsync((user_options)).then(async (validated_filter) => {
-            let reduced_filter: FilterUser = (new UserFilterParams(validated_filter)).get_filter();
+            console.log(validated_filter);
 
-            await this.userService.get_users(reduced_filter).then((data) => {
+            const user_filter: FilterUser = {
+                name: validated_filter.name,
+                surname: validated_filter.surname,
+                age: validated_filter.age,
+                signup_date_start: validated_filter.signup_date_start,
+                signup_date_end: validated_filter.signup_date_end,
+                send_ads: validated_filter.send_ads
+            };
+            const reduced_filter: FilterUser = (new UserFilterParams(user_filter)).get_filter();
+            const pag_opt: PaginationOptions = new PaginationOptions(validated_filter.skip, validated_filter.limit, validated_filter.sort_by, validated_filter.order);
+
+            await this.userService.get_users(reduced_filter, pag_opt).then((data) => {
                 res.json(data);
             })
             .catch((err) => {

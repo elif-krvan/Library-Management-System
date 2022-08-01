@@ -5,6 +5,7 @@ import bcrypt from 'bcrypt';
 import { FilterUser } from "../interface/i_filter";
 import config from "../config/config";
 import {ResponseSuccess } from "../common/response-success";
+import { PaginationOptions } from "../common/pagination-options";
 
 export class UserService {
     private userRepo: UserRepo;
@@ -50,9 +51,9 @@ export class UserService {
         });
     }
 
-    get_users(filter: FilterUser): Promise<ResponseSuccess> {
+    get_users(filter: FilterUser, options: PaginationOptions): Promise<ResponseSuccess> {
         return new Promise<ResponseSuccess> ((resolve, reject) => {
-            this.userRepo.get_users(filter).then((data) => {
+            this.userRepo.get_users(filter, options).then((data) => {
                 resolve(new ResponseSuccess("ok", data));
             })
             .catch((err) => {

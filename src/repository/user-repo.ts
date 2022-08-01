@@ -6,6 +6,7 @@ import format_date from "../common/date-formatter";
 import { FilterUser } from "../interface/i_filter";
 import { UserList } from "../interface/i-user-list";
 import utils from "../common/utils";
+import { PaginationOptions } from "../common/pagination-options";
 
 export class UserRepo {
     
@@ -101,20 +102,19 @@ export class UserRepo {
         });
     }
 
-    async get_users(filter: FilterUser): Promise<UserList> { //?
+    async get_users(filter: FilterUser, options: PaginationOptions): Promise<UserList> { //?
         return new Promise<UserList> (async (resolve, reject) => {
             await db.knx("user") //count filtered users
-            // .select("id") //fix this no password info
-            .count("id as count") //?
+            .count("id as count")
             .where((query_builder) => {
                 utils.user_list_builder(query_builder, filter);
             })
             .then((count_result) => {
-                db.knx("user")
+                db.knx("user") //select users
                 .select("*")
-                .limit(filter.limit as number)
-                .offset(filter.skip)
-                .orderBy(filter.sort_by, filter.order || "asc")
+                .limit(options.limit as number)
+                .offset(options.skip)
+                .orderBy(options.sort_by, options.order || "asc")
                 .where((query_builder) => {
                     utils.user_list_builder(query_builder, filter);
                 })
