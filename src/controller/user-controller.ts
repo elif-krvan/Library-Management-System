@@ -23,7 +23,7 @@ class userController implements BaseRouter {
     
     init_controller(): void {
         this.router.get("/", pagination_middleware, this.get_users);
-        this.router.get("/:user_id", this.get_user_by_id);
+        this.router.get("/:user_id", this.get_user_by_id);        
         this.router.post("/", this.add_user);
         this.router.post("/v2", this.add_user_v2);
         this.router.delete("/:user_id", this.delete_user);
@@ -42,7 +42,6 @@ class userController implements BaseRouter {
 
         console.log(user_options);
         user_validation.user_list_filter_schema.validateAsync((user_options)).then(async (validated_filter) => {
-            console.log(validated_filter);
 
             const user_filter: FilterUser = {
                 name: validated_filter.name,

@@ -18,7 +18,13 @@ class Config {
     public PG_USER: string = process.env.PG_USER || "postgres";
     public PG_PASS: string = process.env.PG_PASS || "password";
 
+    // password hashing
     public SALT_LENGTH: number = parseInt(process.env.SALT_LENGTH as string, 10) || 10;
+
+    // JWT token info
+    public TOKEN_EXPIRE_TIME: number = parseInt(process.env.TOKEN_EXPIRE_TIME as string, 10) || 60; //seconds
+    public TOKEN_ISSUER: string = process.env.TOKEN_ISSUER || "microsoft";
+    public TOKEN_SECRET: string = process.env.TOKEN_SECRET || "bill_gates";
 
     constructor() {
         console.log("configs are loaded");

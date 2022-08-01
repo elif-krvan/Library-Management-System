@@ -7,19 +7,20 @@ import { FilterUser } from "../interface/i_filter";
 import { UserList } from "../interface/i-user-list";
 import utils from "../common/utils";
 import { PaginationOptions } from "../common/pagination-options";
+import { UserLogin } from "../model/user-login";
 
 export class UserRepo {
     
     async add_new_user(user: User): Promise<User> {
         return new Promise(async (resolve, reject) => {
             user.user_id = uuid();
-            user.signup_date = format_date(new Date); //?
-            // user.signup_date = (new Date).toLocaleString("en-US", {timeZone: "Turkey"}); //?
+            user.signup_date = format_date(new Date);
             console.log("date", user);
+            console.log(new Date())
             
             await db.knx<User>("user")
             .insert(user)
-            .returning("*")// edit
+            .returning("*")// edit this!!
             .then((new_user) => {
                 if (new_user[0]) {
                     resolve(new_user[0]); //add new user
@@ -39,6 +40,25 @@ export class UserRepo {
             await db.knx("user")
             .select("*")
             .where("user_id", user_id)
+            .then((result) => {
+                if (result[0]) {
+                    resolve(result[0]);
+                } else {
+                    reject(new UserNotFoundExc()); 
+                }  
+            })
+            .catch((err) => {
+                console.log(err);
+                reject(new DBExc(err));
+            }); 
+        });      
+    }
+
+    async get_user_by_email(email: string): Promise<UserLogin> {
+        return new Promise<UserLogin> (async (resolve, reject) => {
+            await db.knx("user")
+            .select("user_id", "email", "password")
+            .where("email", email)
             .then((result) => {
                 if (result[0]) {
                     resolve(result[0]);
@@ -126,7 +146,6 @@ export class UserRepo {
                     console.log(err);
                     reject(new DBExc(err));
                 });
-
             })
             .catch((err) => {
                 console.log(err);

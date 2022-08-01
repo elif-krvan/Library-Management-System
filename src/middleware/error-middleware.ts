@@ -4,7 +4,7 @@ import { ErrorResponse } from "../common/error";
 
 function error_middleware(error: Exception, req: Request, res: Response, next: NextFunction) {
     const err_res: ErrorResponse = {
-        error: error.error || "error",
+        error: error.validation_error || error.error || "error",
         message: error.message || "something went wrong"
     }
 

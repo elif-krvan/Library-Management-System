@@ -1,8 +1,6 @@
-import { NextFunction, Request, Response } from "express";
-import Joi, { ObjectSchema } from "joi";
-import { ErrorResponse } from "../common/error";
+import Joi from "joi";
 
-class Validation {
+class UserValidation {
     user_schema = Joi.object({
         name: Joi.string().min(3).max(50).pattern(new RegExp('^[a-zA-Z]')).required(),
         surname: Joi.string().min(3).max(50).pattern(new RegExp('^[a-zA-Z]')).required(),
@@ -33,7 +31,7 @@ class Validation {
     pag_schema = Joi.object({
         page: Joi.number().min(1),
         limit: Joi.number().min(1),
-        sort_by: Joi.string().valid("id", "user_id", "name", "surname", "age", "signup_date", "send_ads"), //date is not correct
+        sort_by: Joi.string().valid("id", "user_id", "name", "surname", "age", "signup_date", "send_ads"),
         order: Joi.string().valid("asc", "desc")
     })
     .with("order", "sort_by")
@@ -54,5 +52,5 @@ class Validation {
     id_schema = Joi.string().pattern(new RegExp("^[a-zA-Z0-9-]+$")).required();
 }
 
-const user_validation = new Validation();
+const user_validation = new UserValidation();
 export default user_validation;

@@ -1,5 +1,6 @@
 import express, { Application } from "express"
 import bodyparser from 'body-parser';
+import login_controller from './controller/login-controller';
 import user_controller from './controller/user-controller';
 import { Const } from "./constants/constrants";
 import db from "./db/db";
@@ -39,6 +40,7 @@ export class App {
     load_router() {
         this.app.use(Const.ROUTE_EMPTY, this.appRouter);
         this.appRouter.use(Const.ROUTE_USER, user_controller);
+        this.appRouter.use("/auth", login_controller);
     }
 
     listen(): void {

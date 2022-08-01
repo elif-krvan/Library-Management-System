@@ -6,6 +6,7 @@ import { FilterUser } from "../interface/i_filter";
 import config from "../config/config";
 import {ResponseSuccess } from "../common/response-success";
 import { PaginationOptions } from "../common/pagination-options";
+import { UserLogin } from "../model/user-login";
 
 export class UserService {
     private userRepo: UserRepo;
@@ -46,6 +47,18 @@ export class UserService {
                 resolve(user);
             })
             .catch((err) => {
+                console.log("himm")
+                reject(err);
+            })
+        });
+    }
+
+    get_user_by_email(email: string): Promise<UserLogin> {
+        return new Promise<UserLogin> ((resolve, reject) => {
+            this.userRepo.get_user_by_email(email).then((user) => {
+                resolve(user);
+            })
+            .catch((err) => {
                 reject(err);
             })
         });
@@ -57,6 +70,7 @@ export class UserService {
                 resolve(new ResponseSuccess("ok", data));
             })
             .catch((err) => {
+                console.log("hmm")
                 reject(err);
             })            
         });
