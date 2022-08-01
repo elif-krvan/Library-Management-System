@@ -18,21 +18,22 @@ class Validation {
         surname: Joi.string().min(3).max(50).pattern(new RegExp('^[a-zA-Z]')),
         age: Joi.number().min(18),
         send_ads: Joi.boolean(),
-        signup_date: Joi.date(),
+        signup_date_start: Joi.date(),
+        signup_date_end: Joi.date(),
         sort_by: Joi.string().valid("id", "user_id", "name", "surname", "age", "signup_date", "send_ads"),
         order: Joi.string().valid("asc", "desc"),
         skip: Joi.number().min(0),
         // .when("limit", {is: Joi.exist(), then: Joi.required(), otherwise: Joi.forbidden()}),
         limit: Joi.number().min(1)
     })
-    .with("limit", "page")
-    .with("page", "limit")
+    .with("limit", "skip")
+    .with("skip", "limit")
     .with("order", "sort_by");
 
     pag_schema = Joi.object({
         page: Joi.number().min(1),
         limit: Joi.number().min(1),
-        sort_by: Joi.string().valid("id", "user_id", "name", "surname", "age", "signup_date", "send_ads"),
+        sort_by: Joi.string().valid("id", "user_id", "name", "surname", "age", "signup_date", "send_ads"), //date is not correct
         order: Joi.string().valid("asc", "desc")
     })
     .with("order", "sort_by")

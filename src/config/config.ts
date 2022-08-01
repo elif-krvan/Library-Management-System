@@ -18,7 +18,7 @@ class Config {
     public PG_USER: string = process.env.PG_USER || "postgres";
     public PG_PASS: string = process.env.PG_PASS || "password";
 
-    public SALT_LENGTH: number = parseInt(process.env.SALT_LENGTH as string, 10) || 15;
+    public SALT_LENGTH: number = parseInt(process.env.SALT_LENGTH as string, 10) || 10;
 
     constructor() {
         console.log("configs are loaded");

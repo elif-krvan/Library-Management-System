@@ -5,6 +5,7 @@ import db from "../db/db";
 import format_date from "../common/date-formatter";
 import { FilterUser } from "../interface/i_filter";
 import { UserList } from "../interface/i-user-list";
+import utils from "../common/utils";
 
 export class UserRepo {
     
@@ -102,51 +103,30 @@ export class UserRepo {
 
     async get_users(filter: FilterUser): Promise<UserList> { //?
         return new Promise<UserList> (async (resolve, reject) => {
-            await db.knx("user")
-            .select("*") //fix this no password info
-            .modify((queryBuilder) => {
-                if (filter.name) {
-                    queryBuilder.where("name", filter.name);
-                }
-
-                if (filter.surname) {
-                    queryBuilder.where("surname", filter.surname);
-                }
-
-                if (filter.age) {
-                    queryBuilder.where("age", filter.age);
-                }
-
-                if (filter.send_ads) {
-                    queryBuilder.where("send_ads", filter.send_ads);
-                }
-
-                if (filter.signup_date_start) { //? fix this!!!!                   
-                    queryBuilder.where("signup_date", ">=", filter.signup_date_start);
-                }
-
-                if (filter.signup_date_end) { //? fix this!!!!
-                    queryBuilder.where("signup_date", "<=", filter.signup_date_end)
-                }
-
-                if (filter.sort_by) {
-                    queryBuilder.orderBy(filter.sort_by, filter.order || "asc");
-                }
-
-                if (filter.limit) {
-                    queryBuilder.limit(filter.limit as number)
-                    .offset(filter.skip);
-                }
+            await db.knx("user") //count filtered users
+            // .select("id") //fix this no password info
+            .count("id as count") //?
+            .where((query_builder) => {
+                utils.user_list_builder(query_builder, filter);
             })
-            .then((result) => {
-                db.knx("user").count("id as count").then((count_result) => { //fix
+            .then((count_result) => {
+                db.knx("user")
+                .select("*")
+                .limit(filter.limit as number)
+                .offset(filter.skip)
+                .orderBy(filter.sort_by, filter.order || "asc")
+                .where((query_builder) => {
+                    utils.user_list_builder(query_builder, filter);
+                })
+                .then((result) => {
                     const data: UserList = { total_count: count_result[0].count as number, users: result};
-                    resolve(data);
+                    resolve(data);                                    
                 })
                 .catch((err) => {
                     console.log(err);
                     reject(new DBExc(err));
-                });                
+                });
+
             })
             .catch((err) => {
                 console.log(err);
