@@ -8,7 +8,8 @@ const config: { [key: string]: Knex.Config } = {
     connection: {
       database: "postgres",
       user: "postgres",
-      password: "123456"
+      password: "123456",
+      // timezone: "Europe/Istanbul"
     },
     pool: {
       min: 2,

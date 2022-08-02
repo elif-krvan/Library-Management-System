@@ -4,6 +4,7 @@ import { UserFilterParams } from '../common/filter-params';
 import { PaginationOptions } from '../common/pagination-options';
 import { SuccessResponse } from '../common/success';
 import { FilterUser } from '../interface/i_filter';
+import auth_middleware from '../middleware/auth-middleware';
 import pagination_middleware from '../middleware/pagination-middleware';
 import { User } from '../model/user';
 import { UserService } from '../service/user-service';
@@ -23,10 +24,10 @@ class userController implements BaseRouter {
     
     init_controller(): void {
         this.router.get("/", pagination_middleware, this.get_users);
-        this.router.get("/:user_id", this.get_user_by_id);        
+        this.router.get("/:user_id", auth_middleware, this.get_user_by_id);        
         this.router.post("/", this.add_user);
         this.router.post("/v2", this.add_user_v2);
-        this.router.delete("/:user_id", this.delete_user);
+        this.router.delete("/:user_id", auth_middleware, this.delete_user);
     }
 
     private get_users = async (req: Request, res: Response, next: NextFunction) => {
@@ -40,7 +41,6 @@ class userController implements BaseRouter {
             send_ads: req.query.send_ads as string
         };
 
-        console.log(user_options);
         user_validation.user_list_filter_schema.validateAsync((user_options)).then(async (validated_filter) => {
 
             const user_filter: FilterUser = {

@@ -70,7 +70,6 @@ export class UserService {
                 resolve(new ResponseSuccess("ok", data));
             })
             .catch((err) => {
-                console.log("hmm")
                 reject(err);
             })            
         });
