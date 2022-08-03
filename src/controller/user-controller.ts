@@ -27,9 +27,9 @@ class userController implements BaseRouter {
     }
     
     init_controller(): void {
-        this.router.get("/book", this.get_book); // ?
-        this.router.get("/", pagination_middleware, this.get_users);
-        this.router.get("/:user_id", auth_middleware, this.get_user_by_id);               
+        this.router.get("/book", this.get_book);
+        this.router.get("/:user_id", auth_middleware, this.get_user_by_id);
+        this.router.get("/", pagination_middleware, this.get_users);               
         this.router.post("/", this.add_user);
         this.router.post("/v2", this.add_user_v2);
         this.router.delete("/:user_id", auth_middleware, this.delete_user);
@@ -161,7 +161,7 @@ class userController implements BaseRouter {
         const id: string = req.params.user_id;
         user_validation.id_schema.validateAsync(id).then((validated: string) => {
             this.userService.delete_user(validated).then((deleted_user) => {
-                res.json(new ResponseSuccess("user is deleted")); //?
+                res.json(new ResponseSuccess("user is deleted"));
             })
             .catch((err) => { //user with parameter id does not exist
                 next(err);

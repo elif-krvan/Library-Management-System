@@ -23,13 +23,20 @@ class DB {
     }
 
     constructor() {
-        const TIMESTAMPTZ_OID = 1184;
-        const TIMESTAMP_OID = 1114;
-        types.setTypeParser(TIMESTAMPTZ_OID, val => val as string);
-        types.setTypeParser(TIMESTAMP_OID, val => val as string);
+        this.config_date();
     }
     
     knx: Knex = knex(this.config);
+
+    config_date() {
+        types.setTypeParser(types.builtins.TIMESTAMPTZ, (val) => {
+            return moment(val).tz("Europe/Istanbul").format();
+        });
+    
+        types.setTypeParser(types.builtins.DATE, (val) => {
+            return moment(val).tz("Europe/Istanbul").format();
+        });
+    }
 
     async start(): Promise<boolean> {
         return new Promise<boolean>(async (resolve, reject) => {

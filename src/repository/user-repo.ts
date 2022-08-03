@@ -22,7 +22,7 @@ export class UserRepo {
             .then((new_user) => {
                 if (new_user[0]) {
                     console.log(new_user[0])
-                    new_user[0].signup_date = moment(new_user[0].signup_date).tz("Europe/Istanbul").format("DD.MM.YYYY HH:mm"); //service?
+                    new_user[0].signup_date = moment(new_user[0].signup_date).tz("Europe/Istanbul").format("DD.MM.YYYY HH:mm");
                     resolve(new_user[0].user_id as string);
                 } else {
                     reject(new DBExc("new user cannot be added")); 
@@ -40,11 +40,11 @@ export class UserRepo {
             await db.knx("user")
             .select("user_id", "id", "name", "surname", "send_ads", "email", "signup_date")
             .where("user_id", user_id)
-            .then((result) => {
+            .then((result: User[]) => {
                 if (result[0]) {
                     console.log(result[0].signup_date)
                     result[0].signup_date = moment(result[0].signup_date).tz("Europe/Istanbul").format("DD.MM.YYYY HH:mm");
-                    resolve(result[0]);
+                    resolve(result[0] as User);
                 } else {
                     reject(new UserNotFoundExc()); 
                 }  
@@ -144,7 +144,7 @@ export class UserRepo {
                 .then((result) => {
                     console.log(result[0].signup_date)
                     for (let user of result) { //?
-                        user.signup_date = moment(user.signup_date).tz("Europe/Istanbul");
+                        user.signup_date = moment(user.signup_date).tz("Europe/Istanbul").format();
                     }
                     const data: UserList = { total_count: count_result[0].count as number, users: result};
                     resolve(data);                                    

@@ -18,7 +18,7 @@ export class LibraryService {
 
             axios(config).then((res) => {
                 if (res.status != 200) {
-                    reject(new AxiosExc()); // gerek var mı
+                    reject(new AxiosExc());
                 } else if (Object.keys(res.data).length === 0) {
                     reject(new AxiosExc());              
                 } else {

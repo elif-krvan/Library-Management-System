@@ -5,7 +5,7 @@ export interface User {
     name: string;
     surname: string;
     age: number;
-    signup_date?: Date | string | Moment;
+    signup_date?: string | Moment;
     send_ads: boolean;
     email: string;
     password: string;
