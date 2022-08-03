@@ -20,7 +20,7 @@ export class LibraryService {
                 if (res.status != 200) {
                     reject(new AxiosExc());
                 } else if (Object.keys(res.data).length === 0) {
-                    reject(new AxiosExc());              
+                    resolve([]);              
                 } else {
                     const book_info = JSON.parse(JSON.stringify(res.data))[`ISBN:${isbn}`];
                     const book: Book = {
@@ -32,7 +32,6 @@ export class LibraryService {
                         cover: book_info.cover.medium
                     };
                     
-                    console.log(book)
                     resolve(book);
                 }                
             })

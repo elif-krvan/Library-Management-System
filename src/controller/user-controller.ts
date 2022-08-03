@@ -160,7 +160,7 @@ class userController implements BaseRouter {
         // delete the user if it exists
         const id: string = req.params.user_id;
         user_validation.id_schema.validateAsync(id).then((validated: string) => {
-            this.userService.delete_user(validated).then((deleted_user) => {
+            this.userService.delete_user(validated).then(() => {
                 res.json(new ResponseSuccess("user is deleted"));
             })
             .catch((err) => { //user with parameter id does not exist
