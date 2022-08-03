@@ -13,8 +13,7 @@ class DB {
             user: config.PG_USER,
             password: config.PG_PASS,
             database: config.PG_DB,
-            port: config.PG_PORT,
-            timezone: "Europe/Istanbul"
+            port: config.PG_PORT
         }
     }
 
@@ -23,15 +22,12 @@ class DB {
         tableName: "knex_migrations"
     }
 
-    // types.setTypeParser(1184, (date) => {
-    //     date === null ? null : moment(date).tz("Europe/Istanbul");
-    // })
-    // types.setTypeParser(1114, (date) => {
-    //     date === null ? null : moment(date).tz("Europe/Istanbul");
-    // })
-    // types.setTypeParser(1082, (date) => {
-    //     date === null ? null : moment(date).tz("Europe/Istanbul");
-    // })
+    constructor() {
+        const TIMESTAMPTZ_OID = 1184;
+        const TIMESTAMP_OID = 1114;
+        types.setTypeParser(TIMESTAMPTZ_OID, val => val as string);
+        types.setTypeParser(TIMESTAMP_OID, val => val as string);
+    }
     
     knx: Knex = knex(this.config);
 

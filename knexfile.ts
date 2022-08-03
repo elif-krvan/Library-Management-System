@@ -1,6 +1,11 @@
 import type { Knex } from "knex";
+import * as types from 'pg-types';
 
 // Update with your config settings.
+const TIMESTAMPTZ_OID = 1184;
+const TIMESTAMP_OID = 1114;
+types.setTypeParser(TIMESTAMPTZ_OID, val => val);
+types.setTypeParser(TIMESTAMP_OID, val => val);
 
 const config: { [key: string]: Knex.Config } = {
   development: {

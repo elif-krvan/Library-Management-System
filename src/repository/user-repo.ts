@@ -11,8 +11,8 @@ import moment from "moment-timezone";
 
 export class UserRepo {
     
-    async add_new_user(user: User): Promise<User> {
-        return new Promise(async (resolve, reject) => {
+    async add_new_user(user: User): Promise<string> {
+        return new Promise<string> (async (resolve, reject) => {
             user.user_id = uuid();
             user.signup_date = moment().tz("Europe/Istanbul");
             
@@ -23,7 +23,7 @@ export class UserRepo {
                 if (new_user[0]) {
                     console.log(new_user[0])
                     new_user[0].signup_date = moment(new_user[0].signup_date).tz("Europe/Istanbul").format("DD.MM.YYYY HH:mm"); //service?
-                    resolve(new_user[0] as User);
+                    resolve(new_user[0].user_id as string);
                 } else {
                     reject(new DBExc("new user cannot be added")); 
                 }                
@@ -142,8 +142,9 @@ export class UserRepo {
                     utils.user_list_builder(query_builder, filter);
                 })
                 .then((result) => {
+                    console.log(result[0].signup_date)
                     for (let user of result) { //?
-                        user.signup_date = moment(user.signup_date).tz("Europe/Istanbul").format("DD.MM.YYYY HH:mm");
+                        user.signup_date = moment(user.signup_date).tz("Europe/Istanbul");
                     }
                     const data: UserList = { total_count: count_result[0].count as number, users: result};
                     resolve(data);                                    

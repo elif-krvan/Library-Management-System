@@ -2,12 +2,14 @@ import { Router, Request, Response, NextFunction } from 'express';
 import { Exception, ValidationExc } from '../common/exception';
 import { UserFilterParams } from '../common/filter-params';
 import { PaginationOptions } from '../common/pagination-options';
-import { SuccessResponse } from '../common/success';
+import { ResponseSuccess } from '../common/response-success';
 import { FilterUser } from '../interface/i_filter';
 import auth_middleware from '../middleware/auth-middleware';
 import pagination_middleware from '../middleware/pagination-middleware';
 import { User } from '../model/user';
+import { LibraryService } from '../service/library-service';
 import { UserService } from '../service/user-service';
+import library_validation from '../validation/library-validation';
 import user_validation from '../validation/user-validation';
 import validate_body from '../validation/validate-body';
 import BaseRouter from './base-router';
@@ -15,16 +17,19 @@ import BaseRouter from './base-router';
 class userController implements BaseRouter {
     router: Router;
     userService: UserService;
+    libraryService: LibraryService;
 
     constructor() {
         this.userService = new UserService();
+        this.libraryService = new LibraryService();
         this.router = Router();
         this.init_controller();
     }
     
     init_controller(): void {
+        this.router.get("/book", this.get_book); // ?
         this.router.get("/", pagination_middleware, this.get_users);
-        this.router.get("/:user_id", auth_middleware, this.get_user_by_id);        
+        this.router.get("/:user_id", auth_middleware, this.get_user_by_id);               
         this.router.post("/", this.add_user);
         this.router.post("/v2", this.add_user_v2);
         this.router.delete("/:user_id", auth_middleware, this.delete_user);
@@ -70,15 +75,29 @@ class userController implements BaseRouter {
 
     private get_user_by_id = async (req: Request, res: Response, next: NextFunction) => {
         const id: string = req.params.user_id;
-
+        
         user_validation.id_schema.validateAsync(id).then((validated: string) => {
             this.userService.get_user(validated).then((user) => {
                 
-                const succ_res: SuccessResponse = {
-                    data: user,
-                    message: 'ok'
-                }
-                res.json(succ_res);
+                res.json(new ResponseSuccess("ok", {user: user}));
+            })
+            .catch((err) => {
+                next(err);
+            });
+        })
+        .catch((err) => {
+            const exc: Exception = new ValidationExc(err);
+            next(exc);
+        });        
+    }
+
+    private get_book = async (req: Request, res: Response, next: NextFunction) => {
+        const isbn: string = req.query.isbn as string;
+
+        library_validation.isbn_schema.validateAsync(isbn).then((validated: string) => {
+            console.log("isbn", validated)
+            this.libraryService.get_book_by_isbn(validated).then((book) => {
+                res.json(new ResponseSuccess("ok", {book: book}));
             })
             .catch((err) => {
                 next(err);
@@ -102,11 +121,7 @@ class userController implements BaseRouter {
 
         validate_body.validate_add_user(new_user).then(() => {
             this.userService.create_user(new_user).then((new_user) => {
-                const succ_res: SuccessResponse = {
-                    data: new_user,
-                    message: 'ok'
-                }
-                res.json(succ_res);
+                res.json(new ResponseSuccess("signup is successful", {id: new_user}));
             })
             .catch((err) => {
                 next(err);
@@ -129,11 +144,7 @@ class userController implements BaseRouter {
 
         user_validation.user_schema.validateAsync(new_user).then((validated: User) => {
             this.userService.create_user(validated).then((new_user) => {
-                const succ_res: SuccessResponse = {
-                    data: new_user,
-                    message: 'ok'
-                }
-                res.json(succ_res);
+                res.json(new ResponseSuccess("signup is successful", {id: new_user}));
             })
             .catch((err) => {
                 next(err);
@@ -150,17 +161,13 @@ class userController implements BaseRouter {
         const id: string = req.params.user_id;
         user_validation.id_schema.validateAsync(id).then((validated: string) => {
             this.userService.delete_user(validated).then((deleted_user) => {
-                const succ_res: SuccessResponse = {
-                    data: deleted_user,
-                    message: 'user is deleted'
-                }
-                res.json(succ_res);
+                res.json(new ResponseSuccess("user is deleted")); //?
             })
             .catch((err) => { //user with parameter id does not exist
                 next(err);
             });
         })
-        .catch((err) => { //the parameter is in the wrong format or it does not exist
+        .catch((err) => { //the parameter is in the wrong format
             const exc: Exception = new ValidationExc(err);
             next(exc);
         });

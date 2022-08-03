@@ -15,8 +15,8 @@ export class UserService {
         this.userRepo = new UserRepo();
     }
 
-    create_user(user: User): Promise<User> {
-        return new Promise<User> ((resolve, reject) => {
+    create_user(user: User): Promise<string> {
+        return new Promise<string> ((resolve, reject) => {
             this.userRepo.user_email_exist(user.email).then((exists) => {
                 if (exists) {
                     reject(new UserAlreadyExistExc("user email already exists"));

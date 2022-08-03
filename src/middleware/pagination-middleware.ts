@@ -14,10 +14,14 @@ function pagination_middleware(req: ReqPagination, res: Response, next: NextFunc
     };
 
     pag.sort_by = pag.sort_by == undefined ? "id" : pag.sort_by;
-    pag.order = pag.order == undefined ? "asc" : pag.order;
-    
-    pag.limit = pag.limit == undefined ? 15 : (Number(pag.limit)) > 500 ? 500 : (Number(pag.limit));
+    pag.order = pag.order == undefined ? "asc" : pag.order;    
     pag.page = pag.page == undefined ? 0 : pag.page;
+
+    if (pag.limit) {
+        pag.limit = (Number(pag.limit)) > 500 ? 500 : (Number(pag.limit));
+    } else {
+        pag.limit = 15;
+    }
 
     const skip: number = find_offset(pag.limit, (Number(pag.page)));
 

@@ -1,12 +1,7 @@
 import { Router, Request, Response, NextFunction } from 'express';
-import { UnauthExc } from '../common/exception';
 import { ILogin } from '../interface/i-login';
-import { UserLogin } from '../model/user-login';
-import { UserService } from '../service/user-service';
 import login_validation from '../validation/login-validation';
 import BaseRouter from './base-router';
-import bcrypt from 'bcrypt';
-import sign_token from '../common/sign-token';
 import { ResponseSuccess } from '../common/response-success';
 import auth_middleware from '../middleware/auth-middleware';
 import { LoginService } from '../service/login-service';
@@ -36,12 +31,10 @@ class LoginController implements BaseRouter {
                 res.json(new ResponseSuccess("login is successful", {token: token}));
             })
             .catch((err) => {
-                console.log("login", err);
                 next(err);
             })            
         })
         .catch((err) => {
-            console.log("login", err);
             next(err);
         })
     }

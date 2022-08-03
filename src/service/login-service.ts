@@ -1,11 +1,6 @@
-import { UnauthExc, UserAlreadyExistExc } from "../common/exception";
-import { User } from "../model/user";
+import { UnauthExc } from "../common/exception";
 import { UserRepo } from "../repository/user-repo";
 import bcrypt from 'bcrypt';
-import { FilterUser } from "../interface/i_filter";
-import config from "../config/config";
-import {ResponseSuccess } from "../common/response-success";
-import { PaginationOptions } from "../common/pagination-options";
 import { UserLogin } from "../model/user-login";
 import { ILogin } from "../interface/i-login";
 import sign_token from "../common/sign-token";
@@ -35,7 +30,7 @@ export class LoginService {
                 bcrypt.compare(user_info.password, user_db.password)
                 .then((match) => {
                     if (match) {
-                        sign_token(user_db) //? nerede olmalı
+                        sign_token(user_db)
                         .then((token) => {
                             resolve(token);
                         })

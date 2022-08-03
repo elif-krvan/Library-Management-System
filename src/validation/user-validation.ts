@@ -17,7 +17,9 @@ class UserValidation {
         age: Joi.number().min(18),
         send_ads: Joi.boolean(),
         signup_date_start: Joi.date(),
-        signup_date_end: Joi.date(),
+        signup_date_end: Joi.date().when("signup_date_start", {not: undefined, then: Joi.date().greater(
+            Joi.ref("signup_date_start")
+        ) }),
         sort_by: Joi.string().valid("id", "user_id", "name", "surname", "age", "signup_date", "send_ads"),
         order: Joi.string().valid("asc", "desc"),
         skip: Joi.number().min(0),

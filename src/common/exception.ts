@@ -67,3 +67,10 @@ export class JWTExc extends Exception {
         super(401, "login is unsuccessful", err);
     }
 }
+
+export class AxiosExc extends Exception {
+    constructor(error?: any) {
+        let err: string = error || "incorrect params";
+        super(409, "unsuccessful fetch", err);
+    }
+}
