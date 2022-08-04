@@ -1,22 +1,24 @@
 import { Book } from "../model/book";
 import axios from "axios";
 import { AxiosExc } from "../common/exception";
+import config from "../config/config";
 
 export class LibraryService {
 
     get_book_by_isbn(isbn: string): Promise<any> {
         return new Promise<any> ((resolve, reject) => {
-            const config = { //doğru mu
+            const axios_config = {
                 method: 'get',
-                url: 'https://openlibrary.org/api/books',
+                url: config.OPENLIB_BOOK_URL,
                 params: {
                     bibkeys: `ISBN:${isbn}`,
                     format: "json",
                     jscmd: "data"
                 }
             }
+            console.log(axios_config)
 
-            axios(config).then((res) => {
+            axios(axios_config).then((res) => {
                 if (res.status != 200) {
                     reject(new AxiosExc());
                 } else if (Object.keys(res.data).length === 0) {
@@ -41,7 +43,7 @@ export class LibraryService {
         });
     }
 
-    private get_authors(authors: any): string[] { //where?
+    private get_authors(authors: any): string[] {
         let author_names: string[] = [];
 
         for (let obj of authors) {

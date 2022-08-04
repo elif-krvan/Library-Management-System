@@ -30,11 +30,11 @@ class DB {
 
     config_date() {
         types.setTypeParser(types.builtins.TIMESTAMPTZ, (val) => {
-            return moment(val).tz("Europe/Istanbul").format();
+            return moment(val).local().format();
         });
     
         types.setTypeParser(types.builtins.DATE, (val) => {
-            return moment(val).tz("Europe/Istanbul").format();
+            return moment(val).local().format();
         });
     }
 

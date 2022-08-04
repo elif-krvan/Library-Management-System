@@ -46,7 +46,7 @@ export class ValidationExc extends Exception {
             this.validation_error.push(detail.message);
         }
     }
-}
+} //dogru mu?
 
 export class DBExc extends Exception {
     constructor(error?: any) {
@@ -56,7 +56,14 @@ export class DBExc extends Exception {
 
 export class UnauthExc extends Exception {
     constructor(error?: any) {
-        let err: string = error || "unauthorized";
+        let err: string = error || "error";
+        super(401, "unauthorized", err);//edit
+    }
+}
+
+export class LoginExc extends Exception {
+    constructor(error?: any) {
+        let err: string = error || "incorrect password";
         super(401, "login is unsuccessful", err);//edit
     }
 }

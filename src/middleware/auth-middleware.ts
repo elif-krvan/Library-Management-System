@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from 'express';
+import { Response, NextFunction } from 'express';
 import jwt from "jsonwebtoken";
 import ReqAuth from '../common/auth-decoded';
 import { UnauthExc } from '../common/exception';

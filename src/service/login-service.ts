@@ -1,4 +1,4 @@
-import { UnauthExc } from "../common/exception";
+import { LoginExc, UnauthExc } from "../common/exception";
 import { UserRepo } from "../repository/user-repo";
 import bcrypt from 'bcrypt';
 import { UserLogin } from "../model/user-login";
@@ -39,7 +39,7 @@ export class LoginService {
                             reject(err);
                         })
                     } else {
-                        reject(new UnauthExc("incorrect password"));
+                        reject(new LoginExc("incorrect password"));
                     }                    
                 })
                 .catch((err) => {

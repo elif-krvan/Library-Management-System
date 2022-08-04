@@ -26,6 +26,9 @@ class Config {
     public TOKEN_ISSUER: string = process.env.TOKEN_ISSUER || "microsoft";
     public TOKEN_SECRET: string = process.env.TOKEN_SECRET || "bill_gates";
 
+    // api links
+    public OPENLIB_BOOK_URL: string = process.env.OPENLIB_BOOK_URL || "https://openlibrary.org/api/books";
+
     constructor() {
         console.log("configs are loaded");
     }
