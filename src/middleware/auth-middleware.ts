@@ -13,7 +13,7 @@ function auth_middleware(req: ReqAuth, res: Response, next: NextFunction) {
                 next(error);
             } else {
                 try {
-                    req.auth_decoded = decoded;
+                    req.auth_decoded = decoded;//gerek var mı
                     next();
                 } catch (error) {
                     next(error);

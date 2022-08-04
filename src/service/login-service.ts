@@ -1,4 +1,4 @@
-import { LoginExc, UnauthExc } from "../common/exception";
+import { LoginExc } from "../common/exception";
 import { UserRepo } from "../repository/user-repo";
 import bcrypt from 'bcrypt';
 import { UserLogin } from "../model/user-login";
@@ -35,7 +35,6 @@ export class LoginService {
                             resolve(token);
                         })
                         .catch((err) => {
-                            console.log("login", err);
                             reject(err);
                         })
                     } else {
@@ -43,12 +42,10 @@ export class LoginService {
                     }                    
                 })
                 .catch((err) => {
-                    console.log("login", err);
                     reject(err);
                 });
             })
             .catch((err) => {
-                console.log("login", err);
                 reject(err);
             })
         });

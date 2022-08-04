@@ -2,7 +2,7 @@ import { UserAlreadyExistExc } from "../common/exception";
 import { User } from "../model/user";
 import { UserRepo } from "../repository/user-repo";
 import bcrypt from 'bcrypt';
-import { FilterUser } from "../interface/i_filter";
+import { FilterUser } from "../interface/i-filter";
 import config from "../config/config";
 import {ResponseSuccess } from "../common/response-success";
 import { PaginationOptions } from "../common/pagination-options";
@@ -47,7 +47,6 @@ export class UserService {
                 resolve(user);
             })
             .catch((err) => {
-                console.log("himm")
                 reject(err);
             })
         });

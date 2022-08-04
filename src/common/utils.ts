@@ -1,5 +1,5 @@
 import { Knex } from "knex";
-import { FilterUser } from "../interface/i_filter";
+import { FilterUser } from "../interface/i-filter";
 
 class Utils {
     user_list_builder(query_builder: Knex.QueryBuilder, filter: FilterUser) {

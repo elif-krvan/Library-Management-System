@@ -3,7 +3,7 @@ import { Exception, ValidationExc } from '../common/exception';
 import { UserFilterParams } from '../common/filter-params';
 import { PaginationOptions } from '../common/pagination-options';
 import { ResponseSuccess } from '../common/response-success';
-import { FilterUser } from '../interface/i_filter';
+import { FilterUser } from '../interface/i-filter';
 import auth_middleware from '../middleware/auth-middleware';
 import pagination_middleware from '../middleware/pagination-middleware';
 import { User } from '../model/user';

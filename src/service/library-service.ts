@@ -16,7 +16,6 @@ export class LibraryService {
                     jscmd: "data"
                 }
             }
-            console.log(axios_config)
 
             axios(axios_config).then((res) => {
                 if (res.status != 200) {
@@ -25,6 +24,7 @@ export class LibraryService {
                     resolve([]);              
                 } else {
                     const book_info = JSON.parse(JSON.stringify(res.data))[`ISBN:${isbn}`];
+                    
                     const book: Book = {
                         isbn: isbn,
                         title: book_info.title,

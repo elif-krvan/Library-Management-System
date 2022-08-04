@@ -2,7 +2,7 @@ import { User } from "../model/user";
 import { v4 as uuid } from 'uuid';
 import { DBExc, UserNotFoundExc } from "../common/exception";
 import db from "../db/db";
-import { FilterUser } from "../interface/i_filter";
+import { FilterUser } from "../interface/i-filter";
 import { UserList } from "../interface/i-user-list";
 import utils from "../common/utils";
 import { PaginationOptions } from "../common/pagination-options";
@@ -14,14 +14,15 @@ export class UserRepo {
     async add_new_user(user: User): Promise<string> {
         return new Promise<string> (async (resolve, reject) => {
             user.user_id = uuid();
-            user.signup_date = moment().tz("Europe/Istanbul");
+            user.signup_date = moment().tz("Europe/Istanbul").format();
+            console.log(user.signup_date)
             
-            await db.knx<User>("user")
+            await db.knx("user")
             .insert(user)
             .returning(["user_id", "id", "name", "surname", "send_ads", "email", "signup_date"])
             .then((new_user) => {
                 if (new_user[0]) {
-                    console.log(new_user[0])
+                    console.log(new_user);
                     new_user[0].signup_date = moment(new_user[0].signup_date).tz("Europe/Istanbul").format("DD.MM.YYYY HH:mm");
                     resolve(new_user[0].user_id as string);
                 } else {
@@ -29,7 +30,6 @@ export class UserRepo {
                 }                
             })
             .catch((err) => {
-                console.log(err);
                 reject(new DBExc(err));
             });            
         });        
@@ -42,7 +42,7 @@ export class UserRepo {
             .where("user_id", user_id)
             .then((result: User[]) => {
                 if (result[0]) {
-                    console.log(result[0].signup_date)
+                    console.log(result[0].signup_date);
                     result[0].signup_date = moment(result[0].signup_date).tz("Europe/Istanbul").format("DD.MM.YYYY HH:mm");
                     resolve(result[0] as User);
                 } else {
@@ -50,7 +50,6 @@ export class UserRepo {
                 }  
             })
             .catch((err) => {
-                console.log(err);
                 reject(new DBExc(err));
             }); 
         });      
@@ -70,7 +69,6 @@ export class UserRepo {
                 }  
             })
             .catch((err) => {
-                console.log(err);
                 reject(new DBExc(err));
             }); 
         });      
@@ -89,7 +87,6 @@ export class UserRepo {
                 }
             })
             .catch((err) => {
-                console.log(err);
                 reject(new DBExc(err));
             });            
         });
@@ -104,7 +101,6 @@ export class UserRepo {
                 resolve(result.length != 0);
             })
             .catch((err) => {
-                console.log(err);
                 reject(new DBExc(err));
             });
         });
@@ -119,7 +115,6 @@ export class UserRepo {
                 resolve(result.length != 0);
             })
             .catch((err) => {
-                console.log(err);
                 reject(new DBExc(err));
             });
         });
@@ -142,20 +137,22 @@ export class UserRepo {
                     utils.user_list_builder(query_builder, filter);
                 })
                 .then((result) => {
-                    console.log(result[0].signup_date)
-                    for (let user of result) { //?
-                        user.signup_date = moment(user.signup_date).tz("Europe/Istanbul").format();
+                    if (result.length != 0) {
+                        console.log(result[0])
+                        for (let user of result) { //?
+                            user.signup_date = moment(user.signup_date).tz("Europe/Istanbul").format();
+                        } 
                     }
                     const data: UserList = { total_count: count_result[0].count as number, users: result};
-                    resolve(data);                                    
+                    resolve(data);
+                    
+                                                      
                 })
                 .catch((err) => {
-                    console.log(err);
                     reject(new DBExc(err));
                 });
             })
             .catch((err) => {
-                console.log(err);
                 reject(new DBExc(err));
             }); 
         });

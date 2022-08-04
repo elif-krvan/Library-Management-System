@@ -1,5 +1,3 @@
-// import IUserReq from "./IUserReq";
-
 import { WrongRequestExc } from "../common/exception";
 import { User } from "../model/user";
 

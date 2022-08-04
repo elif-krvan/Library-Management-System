@@ -2,7 +2,7 @@ import knex, { Knex } from "knex";
 import { DBExc } from "../common/exception";
 import config from "../config/config";
 import * as types from 'pg-types';
-import moment from 'moment';
+import moment from 'moment-timezone';
 
 class DB {
 
@@ -30,11 +30,11 @@ class DB {
 
     config_date() {
         types.setTypeParser(types.builtins.TIMESTAMPTZ, (val) => {
-            return moment(val).local().format();
+            return moment(val).tz("Europe/Istanbul").format();
         });
     
         types.setTypeParser(types.builtins.DATE, (val) => {
-            return moment(val).local().format();
+            return moment(val).tz("Europe/Istanbul").format();
         });
     }
 
@@ -45,16 +45,9 @@ class DB {
                 console.log(res);
                 console.log("migration completed successfuly");
 
-                await this.knx.raw("SELECT NOW()::TIMESTAMP AT TIME ZONE 'Europe/Istanbul'")
+                await this.knx.raw("SELECT NOW()")
                 .then((res) => {
                     console.log("current time", res.rows[0]);
-                    this.knx.raw('SHOW TIMEZONE').then((res) => {
-                        console.log("timezone", res.rows[0])
-                    })
-                    .catch((err) => {
-                        console.log(err);
-                        reject(err);
-                    })
                 })
                 .catch((err) => {
                     console.log(err);

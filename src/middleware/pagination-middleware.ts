@@ -2,7 +2,7 @@ import { Response, NextFunction } from 'express';
 import ReqPagination, { PaginationOptions } from '../common/pagination-options';
 
 function find_offset(limit: number, page: number): number {
-    return (page) * limit; //page index starts from 0 //test
+    return page * limit; //page index starts from 0
 }
 
 function pagination_middleware(req: ReqPagination, res: Response, next: NextFunction) {
