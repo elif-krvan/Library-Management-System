@@ -34,6 +34,7 @@ class UserController implements BaseRouter {
         this.router.post("/book", auth_middleware, this.add_book);             
         this.router.post("/", this.add_user);
         this.router.post("/v2", this.add_user_v2);
+        this.router.delete("/book", auth_middleware, this.remove_book);
         this.router.delete("/:user_id", auth_middleware, this.delete_user);
     }
 
@@ -164,10 +165,27 @@ class UserController implements BaseRouter {
     
     private add_book = async (req: Request, res: Response, next: NextFunction) => {
         const isbn: string = req.body.isbn as string;
-        console.log("user", req.user);
 
         library_validation.isbn_schema.validateAsync(isbn).then((validated: string) => {
             this.libraryService.add_book(req.user.user_id, validated).then((book) => {
+                log_service.log(LogStatus.Success, "user add book to library");
+                return res.json(new ResponseSuccess("ok", {book: book}));
+            })
+            .catch((err) => {
+                next(err);
+            });
+        })
+        .catch((err) => {
+            const exc: Exception = new ValidationExc(err);
+            next(exc);
+        });        
+    }
+
+    private remove_book = async (req: Request, res: Response, next: NextFunction) => {
+        const isbn: string = req.body.isbn as string;
+
+        library_validation.isbn_schema.validateAsync(isbn).then((validated: string) => {
+            this.libraryService.remove_book(req.user.user_id, validated).then((book) => {
                 log_service.log(LogStatus.Success, "user add book to library");
                 return res.json(new ResponseSuccess("ok", {book: book}));
             })

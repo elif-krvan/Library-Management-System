@@ -36,8 +36,32 @@ export class UserLibraryRepo {
     async add_book(user_id: string, isbn: string): Promise<boolean> {
         return new Promise<boolean> (async (resolve, reject) => {
             console.log("user lib repo")
+            
             await db.knx("user_library")
             .update({books: db.knx.raw("array_append(books, ?)", isbn)}) //test
+            .where("user_id", user_id)
+            .then((new_user) => {
+                console.log("new user", new_user)
+                if (new_user) {
+                    console.log("lib repo", new_user)
+                    resolve(true);
+                } else {
+                    console.log("anaa")
+                    reject(new DBExc("new book cannot be added")); 
+                }                
+            })
+            .catch((err) => {
+                reject(new DBExc(err));
+            });            
+        });        
+    }
+
+    async remove_book(user_id: string, isbn: string): Promise<boolean> {
+        return new Promise<boolean> (async (resolve, reject) => {
+            console.log("user lib repooo")
+
+            await db.knx("user_library")
+            .update({books: db.knx.raw("array_remove(books, ?)", isbn)})
             .where("user_id", user_id)
             .then((new_user) => {
                 console.log("new user", new_user)

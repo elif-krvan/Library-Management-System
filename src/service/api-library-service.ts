@@ -1,8 +1,9 @@
 import { Book } from "../model/book";
 import axios from "axios";
-import { AxiosExc } from "../common/exception";
+import { AxiosExc, BookNotFoundExc } from "../common/exception";
 import config from "../config/config";
 import { BookSearchParams } from "../common/search-book-params";
+import moment from "moment-timezone";
 
 export class ApiLibraryService {
 
@@ -42,19 +43,19 @@ export class ApiLibraryService {
                 if (res.status != 200) {
                     reject(new AxiosExc());
                 } else if (Object.keys(res.data).length === 0) {
-                    resolve(res.data);              
+                    reject(new BookNotFoundExc());              
                 } else {
                     const book_info = JSON.parse(JSON.stringify(res.data))[`ISBN:${isbn}`];
-                    
+                    // console.log("bookinf ", book_info)
                     const book: Book = {
                         isbn: isbn,
                         title: book_info.title,
                         author: this.get_authors(book_info.authors),
                         publisher: book_info.publishers[0].name,
-                        publish_date: book_info.publish_date,
+                        publish_date: moment(book_info.publish_date).format("YYYY"),
                         cover: book_info.cover.medium
                     };
-                    console.log(book)
+                    console.log("book", book)
                     resolve(book);
                 }                
             })
@@ -119,6 +120,7 @@ export class ApiLibraryService {
 
     private get_authors(authors: any): string[] {
         let author_names: string[] = [];
+        console.log("auth: ", authors)
 
         for (let obj of authors) {
             author_names.push(obj.name);

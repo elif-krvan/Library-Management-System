@@ -5,6 +5,8 @@ import { PaginationOptions } from "../common/pagination-options";
 import { UserFilterParams } from "../common/filter-params";
 import { Book } from "../model/book";
 import { BookList } from "../interface/book-list";
+import log_service from "../service/log-service";
+import { LogStatus } from "../enums/log-status";
 
 export class BookRepo {
     
@@ -12,7 +14,8 @@ export class BookRepo {
         return new Promise<boolean> (async (resolve, reject) => {
             await db.knx("books")
             .insert(book)
-            .then((res) => { //test
+            .returning("id")
+            .then((res) => {
                 if (res[0]) {
                     resolve(true);
                 } else {

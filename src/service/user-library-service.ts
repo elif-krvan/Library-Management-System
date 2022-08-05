@@ -1,4 +1,4 @@
-import { BookExistExc, UserAlreadyExistExc } from "../common/exception";
+import { BookExistExc, BookNotFoundExc, UserAlreadyExistExc } from "../common/exception";
 import {ResponseSuccess } from "../common/response-success";
 import { PaginationOptions } from "../common/pagination-options";
 import { UserFilterParams } from "../common/filter-params";
@@ -7,16 +7,19 @@ import { UserLibraryRepo } from "../repository/user-library-repo";
 import { UserLibrary } from "../model/user-library";
 import { Book } from "../model/book";
 import { ApiLibraryService } from "./api-library-service";
+import { BookService } from "./book-service";
 
 export class UserLibraryService {
     private bookRepo: BookRepo;
     private libRepo: UserLibraryRepo;
     private apiLibraryService: ApiLibraryService;
+    private bookService: BookService;
 
     constructor() {
         this.bookRepo = new BookRepo();
         this.libRepo = new UserLibraryRepo();
         this.apiLibraryService = new ApiLibraryService();
+        this.bookService = new BookService();
     }
 
     create_user(user_id: string): Promise<boolean> {
@@ -46,26 +49,37 @@ export class UserLibraryService {
                 if (book_in_library) {
                     reject(new BookExistExc());
                 } else {
-                    await this.bookRepo.isbn_exist(isbn).then(async (exist) => {
-                        if (!exist) { //test
-                            //add book to books table from the api
-                            await this.apiLibraryService.get_book_by_isbn(isbn).then((book: Book) => {
-                                this.bookRepo.add_book(book);
-                            })
-                            .catch((err) => {
-                                reject(err);
-                            })                    
-                        }
-                            
-                        await this.libRepo.add_book(user_id, isbn).then((res) => {
+                    this.bookService.add_book(isbn).then(() => { //if the book is not in the books library add it to the library first
+                        this.libRepo.add_book(user_id, isbn).then((res) => {
                             resolve(res);
                         })
                         .catch((err) => {
                             reject(err);
-                        })              
+                        });
                     })
+                    .catch((err) => {
+                        reject(err);
+                    });
                 }                
-            })            
+            });            
+        })
+    }
+
+    remove_book(user_id: string, isbn: string): Promise<boolean> {
+        return new Promise<boolean> ((resolve, reject) => {
+            this.libRepo.isbn_exist(user_id, isbn).then(async (book_in_library) => {
+                if (book_in_library) {
+                    //remove book from the library
+                    this.libRepo.remove_book(user_id, isbn).then((res) => {
+                        resolve(res);
+                    })
+                    .catch((err) => {
+                        reject(err);
+                    })
+                } else {
+                    reject(new BookNotFoundExc());
+                }                
+            });            
         })
     }
 
