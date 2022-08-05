@@ -5,8 +5,8 @@ import config from "../config/config";
 
 export class LibraryService {
 
-    get_book_by_isbn(isbn: string): Promise<any> {
-        return new Promise<any> ((resolve, reject) => {
+    get_book_by_isbn(isbn: string): Promise<Book> {
+        return new Promise<Book> ((resolve, reject) => {
             const axios_config = {
                 method: 'get',
                 url: config.OPENLIB_BOOK_URL,
@@ -21,7 +21,7 @@ export class LibraryService {
                 if (res.status != 200) {
                     reject(new AxiosExc());
                 } else if (Object.keys(res.data).length === 0) {
-                    resolve([]);              
+                    resolve(res.data);              
                 } else {
                     const book_info = JSON.parse(JSON.stringify(res.data))[`ISBN:${isbn}`];
                     

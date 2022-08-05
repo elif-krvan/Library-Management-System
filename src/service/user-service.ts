@@ -7,6 +7,7 @@ import config from "../config/config";
 import {ResponseSuccess } from "../common/response-success";
 import { PaginationOptions } from "../common/pagination-options";
 import { UserLogin } from "../model/user-login";
+import { UserFilterParams } from "../common/filter-params";
 
 export class UserService {
     private userRepo: UserRepo;
@@ -63,8 +64,9 @@ export class UserService {
         });
     }
 
-    get_users(filter: FilterUser, options: PaginationOptions): Promise<ResponseSuccess> {
+    get_users(filter: UserFilterParams, options: PaginationOptions): Promise<ResponseSuccess> {
         return new Promise<ResponseSuccess> ((resolve, reject) => {
+            console.log(filter);
             this.userRepo.get_users(filter, options).then((data) => {
                 resolve(new ResponseSuccess("ok", data));
             })

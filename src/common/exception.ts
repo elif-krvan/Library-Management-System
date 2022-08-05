@@ -57,14 +57,14 @@ export class DBExc extends Exception {
 export class UnauthExc extends Exception {
     constructor(error?: any) {
         let err: string = error || "error";
-        super(401, "unauthorized", err);//edit
+        super(401, "unauthorized", err);
     }
 }
 
 export class LoginExc extends Exception {
     constructor(error?: any) {
         let err: string = error || "incorrect password";
-        super(401, "login is unsuccessful", err);//edit
+        super(401, "login is unsuccessful", err);
     }
 }
 

@@ -8,6 +8,7 @@ import utils from "../common/utils";
 import { PaginationOptions } from "../common/pagination-options";
 import { UserLogin } from "../model/user-login";
 import moment from "moment-timezone";
+import { UserFilterParams } from "../common/filter-params";
 
 export class UserRepo {
     
@@ -120,7 +121,7 @@ export class UserRepo {
         });
     }
 
-    async get_users(filter: FilterUser, options: PaginationOptions): Promise<UserList> {
+    async get_users(filter: UserFilterParams, options: PaginationOptions): Promise<UserList> {
         return new Promise<UserList> (async (resolve, reject) => {
             await db.knx("user") //count filtered users
             .count("id as count")

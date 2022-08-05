@@ -56,7 +56,7 @@ class userController implements BaseRouter {
                 signup_date_end: validated_filter.signup_date_end,
                 send_ads: validated_filter.send_ads
             };
-            const reduced_filter: FilterUser = (new UserFilterParams(user_filter)).get_filter();
+            const reduced_filter: UserFilterParams = (new UserFilterParams(user_filter));
             const pag_opt: PaginationOptions = new PaginationOptions(validated_filter.skip, validated_filter.limit, validated_filter.sort_by, validated_filter.order);
 
             await this.userService.get_users(reduced_filter, pag_opt).then((data) => {

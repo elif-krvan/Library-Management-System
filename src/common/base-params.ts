@@ -1,5 +1,5 @@
 export class FilterParams {
-    private params: any;
+    params: any;
 
     constructor(params: any) {
         this.params = params;
