@@ -5,9 +5,14 @@ import { UnauthExc } from '../common/exception';
 import config from "../config/config";
 
 function auth_middleware(req: ReqAuth, res: Response, next: NextFunction) {
-    let token: string;
-    if (req.headers.authorization?.length == 2) {
-        token = req.headers.authorization?.split(" ")[1];
+    if (!req.headers.authorization) {
+        next(new UnauthExc());
+    }
+
+    const arr: string[] = req.headers.authorization?.split(" ") as string[];
+
+    if (arr.length == 2) {
+        const token = arr[1];
 
         if (token) {
             jwt.verify(token, config.TOKEN_SECRET, (error, decoded) => {
@@ -15,7 +20,7 @@ function auth_middleware(req: ReqAuth, res: Response, next: NextFunction) {
                     next(error);
                 } else {
                     try {
-                        req.auth_decoded = decoded;
+                        req.user = decoded;
                         next();
                     } catch (error) {
                         next(error);

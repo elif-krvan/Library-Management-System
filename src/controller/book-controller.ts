@@ -3,17 +3,17 @@ import { Exception, ValidationExc } from "../common/exception";
 import { ResponseSuccess } from '../common/response-success';
 import { BookSearchParams } from '../common/search-book-params';
 import { LogStatus } from '../enums/log-status';
-import { LibraryService } from '../service/library-service';
+import { ApiLibraryService } from '../service/api-library-service';
 import log_service from '../service/log-service';
 import library_validation from "../validation/library-validation";
 import BaseRouter from "./base-router";
 
 class BookController implements BaseRouter {
     router: Router;
-    libraryService: LibraryService;
+    apiLibraryService: ApiLibraryService;
 
     constructor() {
-        this.libraryService = new LibraryService();
+        this.apiLibraryService = new ApiLibraryService();
         this.router = Router();
         this.init_controller();
     }
@@ -31,7 +31,7 @@ class BookController implements BaseRouter {
         library_validation.search_schema.validateAsync(search_param).then((validated) => {
             console.log("isbn", validated)
             const search: BookSearchParams = new BookSearchParams(validated)
-            this.libraryService.search_book(search).then((book) => {
+            this.apiLibraryService.search_book(search).then((book) => {
                 log_service.log(LogStatus.Success, "get user book");
                 return res.json(new ResponseSuccess("ok", {book: book}));
             })

@@ -4,7 +4,7 @@ import { AxiosExc } from "../common/exception";
 import config from "../config/config";
 import { BookSearchParams } from "../common/search-book-params";
 
-export class LibraryService {
+export class ApiLibraryService {
 
     search_book(param: BookSearchParams): Promise<Book[] | Book> {
         return new Promise<Book[] | Book> ((resolve, reject) => {
@@ -54,7 +54,7 @@ export class LibraryService {
                         publish_date: book_info.publish_date,
                         cover: book_info.cover.medium
                     };
-                    
+                    console.log(book)
                     resolve(book);
                 }                
             })

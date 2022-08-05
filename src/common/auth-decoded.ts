@@ -4,13 +4,13 @@ import jwt from "jsonwebtoken";
 declare global {
     namespace Express {
         interface Request {
-            auth_decoded: string | jwt.JwtPayload | undefined;
+            user: any;
         }
     }
 }
 
 interface ReqAuth extends Request {
-    auth_decoded: string | jwt.JwtPayload | undefined; //gerkli mi
+    user: any;
 }
 
 export default ReqAuth;

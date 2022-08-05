@@ -80,3 +80,10 @@ export class AxiosExc extends Exception {
         super(409, "unsuccessful fetch", err);
     }
 }
+
+export class BookExistExc extends Exception {
+    constructor(error?: any) {
+        let err: string = error || "the book is already in your library";
+        super(415, "cannot add book", err);
+    }
+}

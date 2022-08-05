@@ -8,8 +8,8 @@ import { FilterUser } from '../interface/i-filter';
 import auth_middleware from '../middleware/auth-middleware';
 import pagination_middleware from '../middleware/pagination-middleware';
 import { User } from '../model/user';
-import { LibraryService } from '../service/library-service';
 import log_service from '../service/log-service';
+import { UserLibraryService } from '../service/user-library-service';
 import { UserService } from '../service/user-service';
 import library_validation from '../validation/library-validation';
 import user_validation from '../validation/user-validation';
@@ -19,19 +19,19 @@ import BaseRouter from './base-router';
 class UserController implements BaseRouter {
     router: Router;
     userService: UserService;
-    libraryService: LibraryService;
+    libraryService: UserLibraryService;
 
     constructor() {
         this.userService = new UserService();
-        this.libraryService = new LibraryService();
+        this.libraryService = new UserLibraryService();
         this.router = Router();
         this.init_controller();
     }
     
-    init_controller(): void {
-        this.router.get("/book", this.get_book);
+    init_controller(): void {        
         this.router.get("/:user_id", auth_middleware, this.get_user_by_id);
-        this.router.get("/", pagination_middleware, this.get_users);               
+        this.router.get("/", pagination_middleware, this.get_users);  
+        this.router.post("/book", auth_middleware, this.add_book);             
         this.router.post("/", this.add_user);
         this.router.post("/v2", this.add_user_v2);
         this.router.delete("/:user_id", auth_middleware, this.delete_user);
@@ -84,25 +84,6 @@ class UserController implements BaseRouter {
             this.userService.get_user(validated).then((user) => {
                 log_service.log(LogStatus.Success, "get user by id");
                 return res.json(new ResponseSuccess("ok", {user: user}));
-            })
-            .catch((err) => {
-                next(err);
-            });
-        })
-        .catch((err) => {
-            const exc: Exception = new ValidationExc(err);
-            next(exc);
-        });        
-    }
-
-    private get_book = async (req: Request, res: Response, next: NextFunction) => {
-        const isbn: string = req.query.isbn as string;
-
-        library_validation.isbn_schema.validateAsync(isbn).then((validated: string) => {
-            console.log("isbn", validated)
-            this.libraryService.get_book_by_isbn(validated).then((book) => {
-                log_service.log(LogStatus.Success, "get user book");
-                return res.json(new ResponseSuccess("ok", {book: book}));
             })
             .catch((err) => {
                 next(err);
@@ -179,7 +160,26 @@ class UserController implements BaseRouter {
             const exc: Exception = new ValidationExc(err);
             next(exc);
         });
-    }    
+    } 
+    
+    private add_book = async (req: Request, res: Response, next: NextFunction) => {
+        const isbn: string = req.body.isbn as string;
+        console.log("user", req.user);
+
+        library_validation.isbn_schema.validateAsync(isbn).then((validated: string) => {
+            this.libraryService.add_book(req.user.user_id, validated).then((book) => {
+                log_service.log(LogStatus.Success, "user add book to library");
+                return res.json(new ResponseSuccess("ok", {book: book}));
+            })
+            .catch((err) => {
+                next(err);
+            });
+        })
+        .catch((err) => {
+            const exc: Exception = new ValidationExc(err);
+            next(exc);
+        });        
+    }
 }
 
 const user_controller = new UserController();

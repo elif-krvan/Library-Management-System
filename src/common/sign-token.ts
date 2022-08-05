@@ -5,7 +5,7 @@ import { JWTExc } from "./exception";
 
 function sign_token(user: UserLogin): Promise<string> {
     return new Promise<string> ((resolve, reject) => {
-
+        console.log("exp time", config.TOKEN_EXPIRE_TIME);
         try {
             jwt.sign(
                 {
