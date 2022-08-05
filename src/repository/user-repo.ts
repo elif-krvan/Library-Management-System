@@ -2,7 +2,6 @@ import { User } from "../model/user";
 import { v4 as uuid } from 'uuid';
 import { DBExc, UserNotFoundExc } from "../common/exception";
 import db from "../db/db";
-import { FilterUser } from "../interface/i-filter";
 import { UserList } from "../interface/i-user-list";
 import utils from "../common/utils";
 import { PaginationOptions } from "../common/pagination-options";
@@ -140,7 +139,7 @@ export class UserRepo {
                 .then((result) => {
                     if (result.length != 0) {
                         console.log(result[0])
-                        for (let user of result) { //?
+                        for (let user of result) {
                             user.signup_date = moment(user.signup_date).tz("Europe/Istanbul").format();
                         } 
                     }

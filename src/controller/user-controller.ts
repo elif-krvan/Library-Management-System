@@ -3,11 +3,13 @@ import { Exception, ValidationExc } from '../common/exception';
 import { UserFilterParams } from '../common/filter-params';
 import { PaginationOptions } from '../common/pagination-options';
 import { ResponseSuccess } from '../common/response-success';
+import { LogStatus } from '../enums/log-status';
 import { FilterUser } from '../interface/i-filter';
 import auth_middleware from '../middleware/auth-middleware';
 import pagination_middleware from '../middleware/pagination-middleware';
 import { User } from '../model/user';
 import { LibraryService } from '../service/library-service';
+import log_service from '../service/log-service';
 import { UserService } from '../service/user-service';
 import library_validation from '../validation/library-validation';
 import user_validation from '../validation/user-validation';
@@ -56,18 +58,20 @@ class userController implements BaseRouter {
                 signup_date_end: validated_filter.signup_date_end,
                 send_ads: validated_filter.send_ads
             };
-            const reduced_filter: UserFilterParams = (new UserFilterParams(user_filter));
+            const reduced_filter: UserFilterParams = new UserFilterParams(user_filter);
             const pag_opt: PaginationOptions = new PaginationOptions(validated_filter.skip, validated_filter.limit, validated_filter.sort_by, validated_filter.order);
 
             await this.userService.get_users(reduced_filter, pag_opt).then((data) => {
-                res.json(data);
+                log_service.log(LogStatus.Success, "get users");
+                return res.json(data);
             })
             .catch((err) => {
+                log_service.log(LogStatus.Error, "get users: " + err)
                 next(err);
             });
         })
         .catch((err) => {
-            console.log(err)
+            log_service.log(LogStatus.Error, "get users val err: " + err)
             const exc: Exception = new ValidationExc(err);
             next(exc);
         });       

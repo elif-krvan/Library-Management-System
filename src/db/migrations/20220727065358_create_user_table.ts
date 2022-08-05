@@ -1,6 +1,4 @@
 import { Knex } from "knex";
-import db from "../db";
-
 
 export async function up(knex: Knex) {
     return knex.schema.createTable("user", (table) => {

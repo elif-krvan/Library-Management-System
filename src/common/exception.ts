@@ -38,15 +38,14 @@ export class WrongRequestExc extends Exception {
 
 export class ValidationExc extends Exception {
     constructor(error: any) {
-        console.log(error)
         super(407, "wrong request content", "");
+        
         this.validation_error = [];
-
         for (let detail of error.details) {
             this.validation_error.push(detail.message);
-        }
+        }        
     }
-} //dogru mu?
+}
 
 export class DBExc extends Exception {
     constructor(error?: any) {

@@ -2,7 +2,6 @@ import { UserAlreadyExistExc } from "../common/exception";
 import { User } from "../model/user";
 import { UserRepo } from "../repository/user-repo";
 import bcrypt from 'bcrypt';
-import { FilterUser } from "../interface/i-filter";
 import config from "../config/config";
 import {ResponseSuccess } from "../common/response-success";
 import { PaginationOptions } from "../common/pagination-options";
@@ -66,7 +65,6 @@ export class UserService {
 
     get_users(filter: UserFilterParams, options: PaginationOptions): Promise<ResponseSuccess> {
         return new Promise<ResponseSuccess> ((resolve, reject) => {
-            console.log(filter);
             this.userRepo.get_users(filter, options).then((data) => {
                 resolve(new ResponseSuccess("ok", data));
             })

@@ -11,7 +11,6 @@ export class UserFilterParams extends FilterParams {
 
     constructor(params: FilterUser) {
         super(params);
-        console.log("params",params)
 
         if (this.params.name) {this.name = this.params.name};
         if (this.params.surname) {this.surname = this.params.surname};
