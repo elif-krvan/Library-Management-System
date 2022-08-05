@@ -27,7 +27,10 @@ class Config {
     public TOKEN_SECRET: string = process.env.TOKEN_SECRET || "bill_gates";
 
     // api links
+    public OPENLIB_BASE_URL: string = process.env.OPENLIB_BASE_URL || "https://openlibrary.org";
     public OPENLIB_BOOK_URL: string = process.env.OPENLIB_BOOK_URL || "https://openlibrary.org/api/books";
+    public OPENLIB_SEARCH_URL: string = process.env.OPENLIB_SEARCH_URL || "http://openlibrary.org/search.json";
+    public OPENLIB_WORK_URL: string = process.env.OPENLIB_WORK_URL || "https://openlibrary.org/works/";
 
     constructor() {
         console.log("configs are loaded");

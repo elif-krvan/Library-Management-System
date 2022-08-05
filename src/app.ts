@@ -5,6 +5,7 @@ import user_controller from './controller/user-controller';
 import db from "./db/db";
 import error_middleware from "./middleware/error-middleware";
 import config from "./config/config";
+import book_controller from "./controller/book-controller";
 
 export class App {
     private app: Application;
@@ -40,6 +41,7 @@ export class App {
         this.app.use("/", this.appRouter);
         this.appRouter.use("/user", user_controller);
         this.appRouter.use("/auth", login_controller);
+        this.appRouter.use("/book", book_controller);
     }
 
     listen(): void {

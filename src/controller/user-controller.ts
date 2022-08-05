@@ -16,7 +16,7 @@ import user_validation from '../validation/user-validation';
 import validate_body from '../validation/validate-body';
 import BaseRouter from './base-router';
 
-class userController implements BaseRouter {
+class UserController implements BaseRouter {
     router: Router;
     userService: UserService;
     libraryService: LibraryService;
@@ -66,12 +66,12 @@ class userController implements BaseRouter {
                 return res.json(data);
             })
             .catch((err) => {
-                log_service.log(LogStatus.Error, "get users: " + err)
+                log_service.log(LogStatus.Error, "get users: " + err);
                 next(err);
             });
         })
         .catch((err) => {
-            log_service.log(LogStatus.Error, "get users val err: " + err)
+            log_service.log(LogStatus.Error, "get users val err: " + err);
             const exc: Exception = new ValidationExc(err);
             next(exc);
         });       
@@ -82,8 +82,8 @@ class userController implements BaseRouter {
         
         user_validation.id_schema.validateAsync(id).then((validated: string) => {
             this.userService.get_user(validated).then((user) => {
-                
-                res.json(new ResponseSuccess("ok", {user: user}));
+                log_service.log(LogStatus.Success, "get user by id");
+                return res.json(new ResponseSuccess("ok", {user: user}));
             })
             .catch((err) => {
                 next(err);
@@ -101,7 +101,8 @@ class userController implements BaseRouter {
         library_validation.isbn_schema.validateAsync(isbn).then((validated: string) => {
             console.log("isbn", validated)
             this.libraryService.get_book_by_isbn(validated).then((book) => {
-                res.json(new ResponseSuccess("ok", {book: book}));
+                log_service.log(LogStatus.Success, "get user book");
+                return res.json(new ResponseSuccess("ok", {book: book}));
             })
             .catch((err) => {
                 next(err);
@@ -125,7 +126,8 @@ class userController implements BaseRouter {
 
         validate_body.validate_add_user(new_user).then(() => {
             this.userService.create_user(new_user).then((new_user) => {
-                res.json(new ResponseSuccess("signup is successful", {id: new_user}));
+                log_service.log(LogStatus.Success, "add a new user, id: " + new_user);
+                return res.json(new ResponseSuccess("signup is successful", {id: new_user}));
             })
             .catch((err) => {
                 next(err);
@@ -148,7 +150,8 @@ class userController implements BaseRouter {
 
         user_validation.user_schema.validateAsync(new_user).then((validated: User) => {
             this.userService.create_user(validated).then((new_user) => {
-                res.json(new ResponseSuccess("signup is successful", {id: new_user}));
+                log_service.log(LogStatus.Success, "add a new user, id: " + new_user);
+                return res.json(new ResponseSuccess("signup is successful", {id: new_user}));
             })
             .catch((err) => {
                 next(err);
@@ -165,7 +168,8 @@ class userController implements BaseRouter {
         const id: string = req.params.user_id;
         user_validation.id_schema.validateAsync(id).then((validated: string) => {
             this.userService.delete_user(validated).then(() => {
-                res.json(new ResponseSuccess("user is deleted"));
+                log_service.log(LogStatus.Success, "deleted user");
+                return res.json(new ResponseSuccess("user is deleted"));
             })
             .catch((err) => { //user with parameter id does not exist
                 next(err);
@@ -178,5 +182,5 @@ class userController implements BaseRouter {
     }    
 }
 
-const user_controller = new userController();
+const user_controller = new UserController();
 export default user_controller.router;
