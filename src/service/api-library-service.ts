@@ -106,7 +106,6 @@ export class ApiLibraryService {
                 if (res.status != 200) {
                     reject(new AxiosExc());
                 } else if (Object.keys(res.data).length === 0) {
-                    console.log("here ", res.data);
                     resolve(res.data);              
                 } else {
                     resolve(res.data);

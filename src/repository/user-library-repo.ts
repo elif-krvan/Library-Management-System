@@ -36,7 +36,7 @@ export class UserLibraryRepo {
             console.log("user lib repo")
             
             await db.knx("user_library")
-            .update({books: db.knx.raw("array_append(books, ?)", isbn)}) //test
+            .update({books: db.knx.raw("array_append(books, ?)", isbn)})
             .where("user_id", user_id)
             .then((new_user) => {
                 console.log("new user", new_user)
@@ -80,6 +80,7 @@ export class UserLibraryRepo {
     async get_user_library(user_id: string): Promise<string[]> {
         return new Promise<string[]> (async (resolve, reject) => {
             await db.knx("user_library")
+            // .join("books", "books.isbn", "user_library.isbn")
             .select("books")
             .where("user_id", user_id)
             .then((result: string[][]) => {
@@ -147,6 +148,7 @@ export class UserLibraryRepo {
         });
     }
 
+    //edit
     async get_users(filter: UserFilterParams, options: PaginationOptions): Promise<UserLibraryList> {
         return new Promise<UserLibraryList> (async (resolve, reject) => {
             await db.knx("user_library") //count filtered users
