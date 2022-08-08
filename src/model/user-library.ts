@@ -1,4 +1,4 @@
 export interface UserLibrary {
     user_id: string,
-    books: string[]
+    books: string[] | object
 }

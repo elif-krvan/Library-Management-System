@@ -12,13 +12,14 @@ export class UserLibraryRepo {
         return new Promise<boolean> (async (resolve, reject) => {
             const lib: UserLibrary = {
                 user_id: user_id,
-                books: []
+                books: {}
             }
             
             await db.knx("user_library")
             .insert(lib)
-            .then((new_user) => {
-                if (new_user[0]) {
+            .returning("id")
+            .then((res) => {
+                if (res[0]) {
                     resolve(true);
                 } else {
                     reject(new DBExc("new user cannot be added")); 

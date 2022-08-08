@@ -7,12 +7,15 @@ import {ResponseSuccess } from "../common/response-success";
 import { PaginationOptions } from "../common/pagination-options";
 import { UserLogin } from "../model/user-login";
 import { UserFilterParams } from "../common/filter-params";
+import { UserLibraryService } from "./user-library-service";
 
 export class UserService {
     private userRepo: UserRepo;
+    private userLibService: UserLibraryService;
 
     constructor() {
         this.userRepo = new UserRepo();
+        this.userLibService = new UserLibraryService();
     }
 
     create_user(user: User): Promise<string> {
@@ -23,8 +26,14 @@ export class UserService {
                 } else {
                     bcrypt.hash(user.password, config.SALT_LENGTH).then((hash) => {
                         user.password = hash;
-                        this.userRepo.add_new_user(user).then((new_user) => {
-                            resolve(new_user);
+                        this.userRepo.add_new_user(user).then((new_user_id) => {
+                            this.userLibService.create_user(new_user_id).then(() => { //create raw in the lib table
+                                resolve(new_user_id);
+                            })
+                            .catch((err) => {
+                                reject(err);
+                            })
+                            
                         })
                         .catch((err) => {
                             reject(err);
