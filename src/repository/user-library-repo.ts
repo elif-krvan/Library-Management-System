@@ -1,12 +1,9 @@
-import { User } from "../model/user";
 import { DBExc, UserNotFoundExc } from "../common/exception";
 import db from "../db/db";
 import utils from "../common/utils";
 import { PaginationOptions } from "../common/pagination-options";
-import moment from "moment-timezone";
 import { UserFilterParams } from "../common/filter-params";
 import { UserLibrary } from "../model/user-library";
-import { Book } from "../model/book";
 import { UserLibraryList } from "../interface/user-lib-list";
 
 export class UserLibraryRepo {
@@ -82,7 +79,7 @@ export class UserLibraryRepo {
     async get_user_library(user_id: string): Promise<string[]> {
         return new Promise<string[]> (async (resolve, reject) => {
             await db.knx("user_library")
-            .select("*")
+            .select("books")
             .where("user_id", user_id)
             .then((result: string[][]) => {
                 if (result[0]) {

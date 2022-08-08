@@ -28,7 +28,8 @@ class UserController implements BaseRouter {
         this.init_controller();
     }
     
-    init_controller(): void {        
+    init_controller(): void {
+        this.router.get("/book", auth_middleware, this.get_user_library);        
         this.router.get("/:user_id", auth_middleware, this.get_user_by_id);
         this.router.get("/", pagination_middleware, this.get_users);  
         this.router.post("/book", auth_middleware, this.add_book);             
@@ -169,7 +170,7 @@ class UserController implements BaseRouter {
         library_validation.isbn_schema.validateAsync(isbn).then((validated: string) => {
             this.libraryService.add_book(req.user.user_id, validated).then((book) => {
                 log_service.log(LogStatus.Success, "user add book to library");
-                return res.json(new ResponseSuccess("ok", {book: book}));
+                return res.json(new ResponseSuccess("ok", {added: book}));
             })
             .catch((err) => {
                 next(err);
@@ -187,7 +188,7 @@ class UserController implements BaseRouter {
         library_validation.isbn_schema.validateAsync(isbn).then((validated: string) => {
             this.libraryService.remove_book(req.user.user_id, validated).then((book) => {
                 log_service.log(LogStatus.Success, "user add book to library");
-                return res.json(new ResponseSuccess("ok", {book: book}));
+                return res.json(new ResponseSuccess("ok", {deleted: book}));
             })
             .catch((err) => {
                 next(err);
@@ -196,6 +197,16 @@ class UserController implements BaseRouter {
         .catch((err) => {
             const exc: Exception = new ValidationExc(err);
             next(exc);
+        });        
+    }
+
+    private get_user_library = async (req: Request, res: Response, next: NextFunction) => {
+        this.libraryService.get_user_library(req.user.user_id).then((books) => {
+            log_service.log(LogStatus.Success, "user get library data");
+            return res.json(new ResponseSuccess("ok", {books: books}));
+        })
+        .catch((err) => {
+            next(err);
         });        
     }
 }

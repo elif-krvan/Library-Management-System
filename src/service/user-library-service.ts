@@ -2,23 +2,15 @@ import { BookExistExc, BookNotFoundExc, UserAlreadyExistExc } from "../common/ex
 import {ResponseSuccess } from "../common/response-success";
 import { PaginationOptions } from "../common/pagination-options";
 import { UserFilterParams } from "../common/filter-params";
-import { BookRepo } from "../repository/book-repo";
 import { UserLibraryRepo } from "../repository/user-library-repo";
-import { UserLibrary } from "../model/user-library";
-import { Book } from "../model/book";
-import { ApiLibraryService } from "./api-library-service";
 import { BookService } from "./book-service";
 
 export class UserLibraryService {
-    private bookRepo: BookRepo;
     private libRepo: UserLibraryRepo;
-    private apiLibraryService: ApiLibraryService;
     private bookService: BookService;
 
     constructor() {
-        this.bookRepo = new BookRepo();
         this.libRepo = new UserLibraryRepo();
-        this.apiLibraryService = new ApiLibraryService();
         this.bookService = new BookService();
     }
 

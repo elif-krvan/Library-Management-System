@@ -20,7 +20,7 @@ export class BookService {
     add_book(isbn: string): Promise<boolean> {
         return new Promise<boolean> ((resolve, reject) => {
             this.bookRepo.isbn_exist(isbn).then(async (exist) => {
-                if (!exist) { //test
+                if (!exist) {
                     //add book to books table from the api
                     await this.apiLibraryService.get_book_by_isbn(isbn).then((book: Book) => {
                         this.bookRepo.add_book(book).then((res) => {
