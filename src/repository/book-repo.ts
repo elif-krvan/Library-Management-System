@@ -1,4 +1,4 @@
-import { DBExc, UserNotFoundExc } from "../common/exception";
+import { BookNotFoundExc, DBExc, UserNotFoundExc } from "../common/exception";
 import db from "../db/db";
 import utils from "../common/utils";
 import { PaginationOptions } from "../common/pagination-options";
@@ -31,11 +31,11 @@ export class BookRepo {
             await db.knx("books")
             .select("*")
             .where("isbn", isbn)
-            .then((result: Book[]) => {
+            .then((result) => {
                 if (result[0]) {
                     resolve(result[0]);
                 } else {
-                    resolve(false); //edit
+                    reject(new BookNotFoundExc());
                 }  
             })
             .catch((err) => {

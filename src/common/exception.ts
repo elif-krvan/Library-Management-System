@@ -90,7 +90,7 @@ export class BookExistExc extends Exception {
 
 export class BookNotFoundExc extends Exception {
     constructor(error?: any) {
-        let err: string = error || "there is no book with this isbn";
-        super(415, "cannot remove book", err);
+        let err: string = error || "cannot remove book";
+        super(415, "there is no book with this isbn", err);
     }
 }

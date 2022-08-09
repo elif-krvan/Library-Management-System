@@ -34,9 +34,11 @@ class UserController implements BaseRouter {
         this.router.get("/:user_id", auth_middleware, this.get_user_by_id);
         this.router.get("/", pagination_middleware, this.get_users);  
         this.router.post("/book", auth_middleware, this.add_book);             
+        this.router.post("/:user_id/book/:isbn", auth_middleware, this.add_book_to_user);             
         this.router.post("/", this.add_user);
         this.router.post("/v2", this.add_user_v2);
         this.router.delete("/book", auth_middleware, this.remove_book);
+        this.router.delete("/:user_id/book/:isbn", auth_middleware, this.remove_book_from_user);
         this.router.delete("/:user_id", auth_middleware, this.delete_user);
     }
 
@@ -176,6 +178,50 @@ class UserController implements BaseRouter {
             
             this.libraryService.add_book(lib_book).then((book) => {
                 log_service.log(LogStatus.Success, "user add book to library");
+                return res.json(new ResponseSuccess("ok", {added: book}));
+            })
+            .catch((err) => {
+                next(err);
+            });
+        })
+        .catch((err) => {
+            const exc: Exception = new ValidationExc(err);
+            next(exc);
+        });        
+    }
+
+    private add_book_to_user = async (req: Request, res: Response, next: NextFunction) => {
+        const lib_book: UserLibrary = {
+            user_id: req.params.user_id as string,
+            isbn: req.params.isbn as string
+        }
+        
+        library_validation.user_library_schema.validateAsync(lib_book).then((validated_lib: UserLibrary) => {            
+            
+            this.libraryService.add_book(validated_lib).then((book) => {
+                log_service.log(LogStatus.Success, "user add book to library via admin " + req.user.user_id);
+                return res.json(new ResponseSuccess("ok", {added: book}));
+            })
+            .catch((err) => {
+                next(err);
+            });
+        })
+        .catch((err) => {
+            const exc: Exception = new ValidationExc(err);
+            next(exc);
+        });        
+    }
+
+    private remove_book_from_user = async (req: Request, res: Response, next: NextFunction) => {
+        const lib_book: UserLibrary = {
+            user_id: req.params.user_id as string,
+            isbn: req.params.isbn as string
+        }
+
+        library_validation.user_library_schema.validateAsync(lib_book).then((validated_lib: UserLibrary) => {            
+            
+            this.libraryService.remove_book(validated_lib).then((book) => {
+                log_service.log(LogStatus.Success, `user remove book ${validated_lib.isbn} from library via admin ${req.user.user_id}`);
                 return res.json(new ResponseSuccess("ok", {added: book}));
             })
             .catch((err) => {

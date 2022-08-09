@@ -57,11 +57,12 @@ export class UserLibraryRepo {
         return new Promise<string[]> (async (resolve, reject) => {
             await db.knx("user_library")
             // .join("books", "books.isbn", "user_library.isbn")
-            .select("books")
+            .select("isbn")
             .where("user_id", user_id)
-            .then((result: string[][]) => {
-                if (result[0]) {
-                    resolve(result[0]);
+            .then((result) => {
+                console.log(result)
+                if (result) {
+                    resolve(result);
                 } else {
                     reject(new UserNotFoundExc()); 
                 }  
