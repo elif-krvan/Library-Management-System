@@ -28,6 +28,7 @@ class BookController implements BaseRouter {
             isbn: req.query.isbn as string,
             title: req.query.title as string
         }
+        console.log("isbn", search_param.title)
         library_validation.search_schema.validateAsync(search_param).then((validated) => {
             console.log("isbn", validated)
             const search: BookSearchParams = new BookSearchParams(validated)
@@ -43,8 +44,7 @@ class BookController implements BaseRouter {
             const exc: Exception = new ValidationExc(err);
             next(exc);
         });        
-    }
-    
+    }    
 }
 
 const book_controller = new BookController();
