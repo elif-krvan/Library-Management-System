@@ -94,4 +94,15 @@ export class UserService {
             })
         });
     }
+
+    user_id_exist(user_id: string): Promise<boolean> {
+        return new Promise<boolean> ((resolve, reject) => {
+            this.userRepo.user_id_exist(user_id).then((user_exist) => {
+                resolve(user_exist);
+            })
+            .catch((err) => {
+                reject(err);
+            })
+        });
+    }
 }

@@ -207,7 +207,7 @@ class UserController implements BaseRouter {
         
         library_validation.user_library_schema.validateAsync(lib_book).then((validated_lib: UserLibrary) => {            
             
-            this.libraryService.add_book(validated_lib).then((result) => {
+            this.libraryService.add_book_to_user(validated_lib).then((result) => {
                 log_service.log(LogStatus.Success, `user add book ${validated_lib.isbn} to user ${validated_lib.user_id} via user ${req.user.user_id}`);
                 return res.json(result);
             })
@@ -231,7 +231,7 @@ class UserController implements BaseRouter {
 
         library_validation.user_library_schema.validateAsync(lib_book).then((validated_lib: UserLibrary) => {            
             
-            this.libraryService.remove_book(validated_lib).then((result) => {
+            this.libraryService.remove_book_from_user(validated_lib).then((result) => {
                 log_service.log(LogStatus.Success, `user remove book ${validated_lib.isbn} from user ${validated_lib.user_id} via user ${req.user.user_id}`);
                 return res.json(result);
             })
