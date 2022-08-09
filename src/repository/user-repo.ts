@@ -8,11 +8,12 @@ import { PaginationOptions } from "../common/pagination-options";
 import { UserLogin } from "../model/user-login";
 import moment from "moment-timezone";
 import { UserFilterParams } from "../common/filter-params";
+import { IUserId } from "../interface/i-user_id";
 
 export class UserRepo {
     
-    async add_new_user(user: User): Promise<string> {
-        return new Promise<string> (async (resolve, reject) => {
+    async add_new_user(user: User): Promise<IUserId> {
+        return new Promise<IUserId> (async (resolve, reject) => {
             user.user_id = uuid();
             user.signup_date = moment().tz("Europe/Istanbul").format();
             console.log(user.signup_date)
@@ -24,7 +25,8 @@ export class UserRepo {
                 if (new_user[0]) {
                     console.log(new_user);
                     new_user[0].signup_date = moment(new_user[0].signup_date).tz("Europe/Istanbul").format("DD.MM.YYYY HH:mm");
-                    resolve(new_user[0].user_id as string);
+                    const new_user_id: IUserId = {user_id: new_user[0].user_id};
+                    resolve(new_user_id);
                 } else {
                     reject(new DBExc("new user cannot be added")); 
                 }                

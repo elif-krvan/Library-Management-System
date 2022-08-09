@@ -8,6 +8,7 @@ import { PaginationOptions } from "../common/pagination-options";
 import { UserLogin } from "../model/user-login";
 import { UserFilterParams } from "../common/filter-params";
 import { UserLibraryService } from "./user-library-service";
+import { IUserId } from "../interface/i-user_id";
 
 export class UserService {
     private userRepo: UserRepo;
@@ -18,17 +19,16 @@ export class UserService {
         this.userLibService = new UserLibraryService();
     }
 
-    create_user(user: User): Promise<string> {
-        return new Promise<string> ((resolve, reject) => {
+    create_user(user: User): Promise<ResponseSuccess> {
+        return new Promise<ResponseSuccess> ((resolve, reject) => {
             this.userRepo.user_email_exist(user.email).then((exists) => {
                 if (exists) {
                     reject(new UserAlreadyExistExc("user email already exists"));
                 } else {
                     bcrypt.hash(user.password, config.SALT_LENGTH).then((hash) => {
                         user.password = hash;
-                        this.userRepo.add_new_user(user).then((new_user_id) => {
-                            resolve(new_user_id);
-                            
+                        this.userRepo.add_new_user(user).then((new_user_id: IUserId) => {
+                            resolve(new ResponseSuccess("ok", new_user_id));                            
                         })
                         .catch((err) => {
                             reject(err);
@@ -45,10 +45,10 @@ export class UserService {
         });
     }
 
-    get_user(user_id: string): Promise<User> {
-        return new Promise<User> ((resolve, reject) => {
-            this.userRepo.get_user(user_id).then((user) => {
-                resolve(user);
+    get_user(user_id: string): Promise<ResponseSuccess> {
+        return new Promise<ResponseSuccess> ((resolve, reject) => {
+            this.userRepo.get_user(user_id).then((user: User) => {
+                resolve(new ResponseSuccess("ok", {user: user}));
             })
             .catch((err) => {
                 reject(err);
@@ -56,10 +56,10 @@ export class UserService {
         });
     }
 
-    get_user_by_email(email: string): Promise<UserLogin> {
-        return new Promise<UserLogin> ((resolve, reject) => {
-            this.userRepo.get_user_by_email(email).then((user) => {
-                resolve(user);
+    get_user_by_email(email: string): Promise<ResponseSuccess> {
+        return new Promise<ResponseSuccess> ((resolve, reject) => {
+            this.userRepo.get_user_by_email(email).then((user: UserLogin) => {
+                resolve(new ResponseSuccess("ok", user));
             })
             .catch((err) => {
                 reject(err);
@@ -78,11 +78,11 @@ export class UserService {
         });
     }
 
-    delete_user(user_id: string): Promise<boolean> {
-        return new Promise<boolean> ((resolve, reject) => {
-            this.userRepo.delete_user(user_id).then((result) => {
+    delete_user(user_id: string): Promise<ResponseSuccess> {
+        return new Promise<ResponseSuccess> ((resolve, reject) => {
+            this.userRepo.delete_user(user_id).then((result) => { //resultu kullanayım mı
                 this.userLibService.delete_user(user_id).then((res) => {
-                    resolve(result);
+                    resolve(new ResponseSuccess("user is deleted"));
                 })
                 .catch((err) => {
                     reject(err);

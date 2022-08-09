@@ -1,4 +1,4 @@
-import { DBExc, UserNotFoundExc } from "../common/exception";
+import { BookNotFoundExc, DBExc, UserNotFoundExc } from "../common/exception";
 import db from "../db/db";
 import utils from "../common/utils";
 import { PaginationOptions } from "../common/pagination-options";
@@ -6,22 +6,21 @@ import { UserFilterParams } from "../common/filter-params";
 import { UserLibrary } from "../model/user-library";
 import { UserLibraryList } from "../interface/user-lib-list";
 import { BookList } from "../interface/book-list";
+import { IISBN } from "../interface/i-isbn";
 
 export class UserLibraryRepo {
 
-    async add_book(lib_book: UserLibrary): Promise<boolean> {
-        return new Promise<boolean> (async (resolve, reject) => {
-            console.log("user lib repo")
-            
+    async add_book(lib_book: UserLibrary): Promise<IISBN> {
+        return new Promise<IISBN> (async (resolve, reject) => {
             await db.knx("user_library")
             .insert(lib_book)
-            .returning("*")
-            .then((new_user) => {
-                console.log("new user", new_user)
-                if (new_user[0]) {
-                    resolve(true);
+            .returning("isbn")
+            .then((new_book) => {
+                console.log("new user", new_book)
+                if (new_book[0]) {
+                    const data: IISBN = {isbn: new_book[0].isbn};
+                    resolve(data);
                 } else {
-                    console.log("anaa")
                     reject(new DBExc("new book cannot be added")); 
                 }                
             })
@@ -33,7 +32,6 @@ export class UserLibraryRepo {
 
     async remove_book(lib_book: UserLibrary): Promise<boolean> {
         return new Promise<boolean> (async (resolve, reject) => {
-            console.log("user lib repooo")
 
             await db.knx("user_library")
             .where("user_id", lib_book.user_id)
@@ -45,7 +43,7 @@ export class UserLibraryRepo {
                     console.log("lib repo", result)
                     resolve(true);
                 } else {
-                    reject(new DBExc("new book cannot be added")); 
+                    reject(new BookNotFoundExc("book cannot be removed")); 
                 }                
             })
             .catch((err) => {

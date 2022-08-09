@@ -2,7 +2,6 @@ import { Router, Request, Response, NextFunction } from 'express';
 import { Exception, ValidationExc } from '../common/exception';
 import { UserFilterParams } from '../common/filter-params';
 import { PaginationOptions } from '../common/pagination-options';
-import { ResponseSuccess } from '../common/response-success';
 import { LogStatus } from '../enums/log-status';
 import { FilterUser } from '../interface/i-filter';
 import auth_middleware from '../middleware/auth-middleware';
@@ -42,7 +41,7 @@ class UserController implements BaseRouter {
         this.router.delete("/:user_id", auth_middleware, this.delete_user);
     }
 
-    private get_users = async (req: Request, res: Response, next: NextFunction) => {
+    private get_users = async (req: Request, res: Response, next: NextFunction) => { //add validation!!
         const user_options = {
             ...req.pag_option,
             name: req.query.name as string,
@@ -86,15 +85,17 @@ class UserController implements BaseRouter {
         const id: string = req.params.user_id;
         
         user_validation.id_schema.validateAsync(id).then((validated: string) => {
-            this.userService.get_user(validated).then((user) => {
-                log_service.log(LogStatus.Success, "get user by id");
-                return res.json(new ResponseSuccess("ok", {user: user}));
+            this.userService.get_user(validated).then((result) => {
+                log_service.log(LogStatus.Success, `get user by id ${validated} via user ${req.user.user_id}`);
+                return res.json(result);
             })
             .catch((err) => {
+                log_service.log(LogStatus.Error, "add a new user: " + err);
                 next(err);
             });
         })
         .catch((err) => {
+            log_service.log(LogStatus.Error, "add a new user: " + err);
             const exc: Exception = new ValidationExc(err);
             next(exc);
         });        
@@ -111,15 +112,17 @@ class UserController implements BaseRouter {
         }
 
         validate_body.validate_add_user(new_user).then(() => {
-            this.userService.create_user(new_user).then((new_user) => {
-                log_service.log(LogStatus.Success, "add a new user, id: " + new_user);
-                return res.json(new ResponseSuccess("signup is successful", {id: new_user}));
+            this.userService.create_user(new_user).then((result) => {
+                log_service.log(LogStatus.Success, "add a new user, id: " + result.data?.user_id);
+                return res.json(result);
             })
             .catch((err) => {
+                log_service.log(LogStatus.Error, "add new user: " + err);
                 next(err);
             });
         })
         .catch((err) => {
+            log_service.log(LogStatus.Error, "add a new user: " + err);
             next(err);
         });
     }
@@ -135,15 +138,17 @@ class UserController implements BaseRouter {
         }
 
         user_validation.user_schema.validateAsync(new_user).then((validated: User) => {
-            this.userService.create_user(validated).then((new_user) => {
-                log_service.log(LogStatus.Success, "add a new user, id: " + new_user);
-                return res.json(new ResponseSuccess("signup is successful", {id: new_user}));
+            this.userService.create_user(validated).then((result) => {
+                log_service.log(LogStatus.Success, "added a new user, id: " + result.data?.user_id);
+                return res.json(result);
             })
             .catch((err) => {
+                log_service.log(LogStatus.Error, "add a new user: " + err);
                 next(err);
             });
         })
         .catch((err) => {
+            log_service.log(LogStatus.Error, "add a new user: " + err);
             const exc: Exception = new ValidationExc(err);
             next(exc);
         });
@@ -153,15 +158,17 @@ class UserController implements BaseRouter {
         // delete the user if it exists
         const id: string = req.params.user_id;
         user_validation.id_schema.validateAsync(id).then((validated: string) => {
-            this.userService.delete_user(validated).then(() => {
-                log_service.log(LogStatus.Success, "deleted user");
-                return res.json(new ResponseSuccess("user is deleted"));
+            this.userService.delete_user(validated).then((result) => {
+                log_service.log(LogStatus.Success, `user deleted ${validated} via user ${req.user.user_id}`);
+                return res.json(result);
             })
             .catch((err) => { //user with parameter id does not exist
+                log_service.log(LogStatus.Error, `delete user ${validated} via user ${req.user.user_id}: ` + err);
                 next(err);
             });
         })
         .catch((err) => { //the parameter is in the wrong format
+            log_service.log(LogStatus.Error, `delete user ${id} via user ${req.user.user_id}: ` + err);
             const exc: Exception = new ValidationExc(err);
             next(exc);
         });
@@ -176,15 +183,17 @@ class UserController implements BaseRouter {
                 isbn: validated_isbn
             }
             
-            this.libraryService.add_book(lib_book).then((book) => {
+            this.libraryService.add_book(lib_book).then((result) => {
                 log_service.log(LogStatus.Success, "user add book to library");
-                return res.json(new ResponseSuccess("ok", {added: book}));
+                return res.json(result);
             })
             .catch((err) => {
+                log_service.log(LogStatus.Error, `add book ${validated_isbn} via user ${lib_book.user_id}: ` + err);
                 next(err);
             });
         })
         .catch((err) => {
+            log_service.log(LogStatus.Error, `add book ${isbn} via user ${req.user.user_id}: ` + err);
             const exc: Exception = new ValidationExc(err);
             next(exc);
         });        
@@ -198,15 +207,17 @@ class UserController implements BaseRouter {
         
         library_validation.user_library_schema.validateAsync(lib_book).then((validated_lib: UserLibrary) => {            
             
-            this.libraryService.add_book(validated_lib).then((book) => {
-                log_service.log(LogStatus.Success, "user add book to library via admin " + req.user.user_id);
-                return res.json(new ResponseSuccess("ok", {added: book}));
+            this.libraryService.add_book(validated_lib).then((result) => {
+                log_service.log(LogStatus.Success, `user add book ${validated_lib.isbn} to user ${validated_lib.user_id} via user ${req.user.user_id}`);
+                return res.json(result);
             })
             .catch((err) => {
+                log_service.log(LogStatus.Error, `add book ${validated_lib.isbn} to user ${validated_lib.user_id} via user ${req.user.user_id}: ` + err);
                 next(err);
             });
         })
         .catch((err) => {
+            log_service.log(LogStatus.Error, `add book ${lib_book.isbn} to user ${lib_book.user_id} via user ${req.user.user_id}: ` + err);
             const exc: Exception = new ValidationExc(err);
             next(exc);
         });        
@@ -220,15 +231,17 @@ class UserController implements BaseRouter {
 
         library_validation.user_library_schema.validateAsync(lib_book).then((validated_lib: UserLibrary) => {            
             
-            this.libraryService.remove_book(validated_lib).then((book) => {
-                log_service.log(LogStatus.Success, `user remove book ${validated_lib.isbn} from library via admin ${req.user.user_id}`);
-                return res.json(new ResponseSuccess("ok", {added: book}));
+            this.libraryService.remove_book(validated_lib).then((result) => {
+                log_service.log(LogStatus.Success, `user remove book ${validated_lib.isbn} from user ${validated_lib.user_id} via user ${req.user.user_id}`);
+                return res.json(result);
             })
             .catch((err) => {
+                log_service.log(LogStatus.Error, `remove book ${validated_lib.isbn} from user ${validated_lib.user_id} via user ${req.user.user_id}: ` + err);
                 next(err);
             });
         })
         .catch((err) => {
+            log_service.log(LogStatus.Error, `remove book ${lib_book.isbn} from user ${lib_book.user_id} via user ${req.user.user_id}: ` + err);
             const exc: Exception = new ValidationExc(err);
             next(exc);
         });        
@@ -243,15 +256,17 @@ class UserController implements BaseRouter {
                 isbn: validated_isbn
             }
 
-            this.libraryService.remove_book(lib_book).then((book) => {
-                log_service.log(LogStatus.Success, "user add book to library");
-                return res.json(new ResponseSuccess("ok", {deleted: book}));
+            this.libraryService.remove_book(lib_book).then((result) => {
+                log_service.log(LogStatus.Success, `user remove book ${lib_book.isbn} via user ${lib_book.user_id}`);
+                return res.json(result);
             })
             .catch((err) => {
+                log_service.log(LogStatus.Error, `remove book ${lib_book.isbn} via user ${req.user.user_id}: ` + err);
                 next(err);
             });
         })
         .catch((err) => {
+            log_service.log(LogStatus.Error, `remove book ${isbn} via user ${req.user.user_id}: ` + err);
             const exc: Exception = new ValidationExc(err);
             next(exc);
         });        
@@ -259,10 +274,11 @@ class UserController implements BaseRouter {
 
     private get_user_library = async (req: Request, res: Response, next: NextFunction) => {
         this.libraryService.get_user_library(req.user.user_id).then((result) => {
-            log_service.log(LogStatus.Success, "user get library data");
+            log_service.log(LogStatus.Success, `get user library via user ${req.user.user_id}: `);
             return res.json(result);
         })
         .catch((err) => {
+            log_service.log(LogStatus.Error, `get user library via user ${req.user.user_id}: ` + err);
             next(err);
         });        
     }

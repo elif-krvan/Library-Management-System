@@ -5,6 +5,7 @@ import { UserFilterParams } from "../common/filter-params";
 import { UserLibraryRepo } from "../repository/user-library-repo";
 import { BookService } from "./book-service";
 import { UserLibrary } from "../model/user-library";
+import { IISBN } from "../interface/i-isbn";
 
 export class UserLibraryService {
     private libRepo: UserLibraryRepo;
@@ -15,16 +16,16 @@ export class UserLibraryService {
         this.bookService = new BookService();
     }
 
-    add_book(lib_book: UserLibrary): Promise<boolean> {
-        return new Promise<boolean> ((resolve, reject) => {
+    add_book(lib_book: UserLibrary): Promise<ResponseSuccess> {
+        return new Promise<ResponseSuccess> ((resolve, reject) => {
             this.libRepo.isbn_exist(lib_book).then(async (book_in_library) => {
                 if (book_in_library) {
                     reject(new BookExistExc());
                 } else {
                     this.bookService.add_book(lib_book.isbn).then(() => { //if the book is not in the books library add it to the library first
                         
-                        this.libRepo.add_book(lib_book).then((res) => {
-                            resolve(res);
+                        this.libRepo.add_book(lib_book).then((new_book_isbn: IISBN) => {
+                            resolve(new ResponseSuccess("book is added to library", new_book_isbn));
                         })
                         .catch((err) => {
                             reject(err);
@@ -34,17 +35,20 @@ export class UserLibraryService {
                         reject(err);
                     });
                 }                
+            })
+            .catch((err) => {
+                reject(err);
             });            
         })
     }
 
-    remove_book(lib_book: UserLibrary): Promise<boolean> {
-        return new Promise<boolean> ((resolve, reject) => {
+    remove_book(lib_book: UserLibrary): Promise<ResponseSuccess> {
+        return new Promise<ResponseSuccess> ((resolve, reject) => {
             this.libRepo.isbn_exist(lib_book).then(async (book_in_library) => {
                 if (book_in_library) {
                     //remove book from the library
                     this.libRepo.remove_book(lib_book).then((res) => {
-                        resolve(res);
+                        resolve(new ResponseSuccess("book is removed from the library"));
                     })
                     .catch((err) => {
                         reject(err);
