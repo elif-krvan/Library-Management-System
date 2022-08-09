@@ -4,6 +4,7 @@ import { UserFilterParams } from '../common/filter-params';
 import { PaginationOptions } from '../common/pagination-options';
 import { LogStatus } from '../enums/log-status';
 import { FilterUser } from '../interface/i-filter';
+import { IUserId } from '../interface/i-user_id';
 import auth_middleware from '../middleware/auth-middleware';
 import pagination_middleware from '../middleware/pagination-middleware';
 import { User } from '../model/user';
@@ -30,6 +31,7 @@ class UserController implements BaseRouter {
     
     init_controller(): void {
         this.router.get("/book", auth_middleware, this.get_user_library);        
+        this.router.get("/:user_id/book", auth_middleware, this.get_user_library_general);
         this.router.get("/:user_id", auth_middleware, this.get_user_by_id);
         this.router.get("/", pagination_middleware, this.get_users);  
         this.router.post("/book", auth_middleware, this.add_book);             
@@ -279,6 +281,25 @@ class UserController implements BaseRouter {
         })
         .catch((err) => {
             log_service.log(LogStatus.Error, `get user library via user ${req.user.user_id}: ` + err);
+            next(err);
+        });        
+    }
+
+    private get_user_library_general = async (req: Request, res: Response, next: NextFunction) => {
+        const user_id: string = req.params.user_id as string;
+
+        user_validation.id_schema.validateAsync(user_id).then((validated_user_id) => {
+            this.libraryService.get_user_library_general(validated_user_id).then((result) => {
+                log_service.log(LogStatus.Success, `get user library ${validated_user_id} via user ${req.user.user_id}: `);
+                return res.json(result);
+            })
+            .catch((err) => {
+                log_service.log(LogStatus.Error, `get user library ${validated_user_id} via user ${req.user.user_id}: ` + err);
+                next(err);
+            }); 
+        })
+        .catch((err) => {
+            log_service.log(LogStatus.Error, `get user library ${user_id} via user ${req.user.user_id}: ` + err);
             next(err);
         });        
     }

@@ -137,6 +137,26 @@ export class UserLibraryService {
         });
     }
 
+    get_user_library_general(user_id: string): Promise<ResponseSuccess> {
+        return new Promise<ResponseSuccess> ((resolve, reject) => {
+            this.userRepo.user_id_exist(user_id).then((user_exist) => {
+                if (!user_exist) {
+                    reject(new UserNotFoundExc());
+                } else {
+                    this.get_user_library(user_id).then((result) => {
+                        resolve(result);
+                    })
+                    .catch((err)=> {
+                        reject(err);
+                    })
+                }
+            })
+            .catch((err) => {
+                reject(err);
+            })
+        });
+    }
+
     delete_user(user_id: string): Promise<boolean> {
         return new Promise<boolean> ((resolve, reject) => {
             this.libRepo.delete_user(user_id).then((result) => {
