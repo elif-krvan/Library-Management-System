@@ -56,10 +56,10 @@ export class UserLibraryService {
         })
     }
 
-    get_user_library(user_id: string): Promise<string[]> { //return user's books
-        return new Promise<string[]> ((resolve, reject) => {
-            this.libRepo.get_user_library(user_id).then((books) => {
-                resolve(books);
+    get_user_library(user_id: string): Promise<ResponseSuccess> { //return user's books
+        return new Promise<ResponseSuccess> ((resolve, reject) => {
+            this.libRepo.get_user_library(user_id).then((data) => {
+                resolve(new ResponseSuccess("ok", data));
             })
             .catch((err) => {
                 reject(err);

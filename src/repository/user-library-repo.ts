@@ -5,6 +5,7 @@ import { PaginationOptions } from "../common/pagination-options";
 import { UserFilterParams } from "../common/filter-params";
 import { UserLibrary } from "../model/user-library";
 import { UserLibraryList } from "../interface/user-lib-list";
+import { BookList } from "../interface/book-list";
 
 export class UserLibraryRepo {
 
@@ -53,23 +54,28 @@ export class UserLibraryRepo {
         });        
     }
 
-    async get_user_library(user_id: string): Promise<string[]> {
-        return new Promise<string[]> (async (resolve, reject) => {
+    async get_user_library(user_id: string): Promise<BookList> {
+        return new Promise<BookList> (async (resolve, reject) => {
             await db.knx("user_library")
-            // .join("books", "books.isbn", "user_library.isbn")
-            .select("isbn")
-            .where("user_id", user_id)
-            .then((result) => {
-                console.log(result)
-                if (result) {
-                    resolve(result);
-                } else {
-                    reject(new UserNotFoundExc()); 
-                }  
+            .count("id as count")
+            .where("user_library.user_id", user_id)
+            .then(async (count) => {
+                await db.knx("user_library")
+                .join("books as b", "b.isbn", "user_library.isbn")
+                .select(["b.isbn", "b.title", "b.author", "b.publisher", "b.publish_date", "b.cover"])
+                .where("user_library.user_id", user_id)
+                .then((result) => {
+                    const data: BookList = {
+                        total_count: count[0].count as number,
+                        books: result
+                    }  
+                    resolve(data);
+                })
+                .catch((err) => {
+                    reject(new DBExc(err));
+                });
             })
-            .catch((err) => {
-                reject(new DBExc(err));
-            }); 
+             
         });      
     }
 

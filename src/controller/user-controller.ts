@@ -258,9 +258,9 @@ class UserController implements BaseRouter {
     }
 
     private get_user_library = async (req: Request, res: Response, next: NextFunction) => {
-        this.libraryService.get_user_library(req.user.user_id).then((books) => {
+        this.libraryService.get_user_library(req.user.user_id).then((result) => {
             log_service.log(LogStatus.Success, "user get library data");
-            return res.json(new ResponseSuccess("ok", {books: books}));
+            return res.json(result);
         })
         .catch((err) => {
             next(err);
