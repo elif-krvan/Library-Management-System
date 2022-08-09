@@ -27,12 +27,7 @@ export class UserService {
                     bcrypt.hash(user.password, config.SALT_LENGTH).then((hash) => {
                         user.password = hash;
                         this.userRepo.add_new_user(user).then((new_user_id) => {
-                            this.userLibService.create_user(new_user_id).then(() => { //create raw in the lib table
-                                resolve(new_user_id);
-                            })
-                            .catch((err) => {
-                                reject(err);
-                            })
+                            resolve(new_user_id);
                             
                         })
                         .catch((err) => {
@@ -86,7 +81,13 @@ export class UserService {
     delete_user(user_id: string): Promise<boolean> {
         return new Promise<boolean> ((resolve, reject) => {
             this.userRepo.delete_user(user_id).then((result) => {
-                resolve(result);
+                this.userLibService.delete_user(user_id).then((res) => {
+                    resolve(result);
+                })
+                .catch((err) => {
+                    reject(err);
+                })
+                
             })
             .catch((err) => {
                 reject(err);

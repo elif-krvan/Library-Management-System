@@ -8,6 +8,7 @@ import { FilterUser } from '../interface/i-filter';
 import auth_middleware from '../middleware/auth-middleware';
 import pagination_middleware from '../middleware/pagination-middleware';
 import { User } from '../model/user';
+import { UserLibrary } from '../model/user-library';
 import log_service from '../service/log-service';
 import { UserLibraryService } from '../service/user-library-service';
 import { UserService } from '../service/user-service';
@@ -167,8 +168,13 @@ class UserController implements BaseRouter {
     private add_book = async (req: Request, res: Response, next: NextFunction) => {
         const isbn: string = req.body.isbn as string;
 
-        library_validation.isbn_schema.validateAsync(isbn).then((validated: string) => {
-            this.libraryService.add_book(req.user.user_id, validated).then((book) => {
+        library_validation.isbn_schema.validateAsync(isbn).then((validated_isbn: string) => {
+            const lib_book: UserLibrary = {
+                user_id: req.user.user_id,
+                isbn: validated_isbn
+            }
+            
+            this.libraryService.add_book(lib_book).then((book) => {
                 log_service.log(LogStatus.Success, "user add book to library");
                 return res.json(new ResponseSuccess("ok", {added: book}));
             })
@@ -185,8 +191,13 @@ class UserController implements BaseRouter {
     private remove_book = async (req: Request, res: Response, next: NextFunction) => {
         const isbn: string = req.body.isbn as string;
 
-        library_validation.isbn_schema.validateAsync(isbn).then((validated: string) => {
-            this.libraryService.remove_book(req.user.user_id, validated).then((book) => {
+        library_validation.isbn_schema.validateAsync(isbn).then((validated_isbn: string) => {
+            const lib_book: UserLibrary = {
+                user_id: req.user.user_id,
+                isbn: validated_isbn
+            }
+
+            this.libraryService.remove_book(lib_book).then((book) => {
                 log_service.log(LogStatus.Success, "user add book to library");
                 return res.json(new ResponseSuccess("ok", {deleted: book}));
             })
