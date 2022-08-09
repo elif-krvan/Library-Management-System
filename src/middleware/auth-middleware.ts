@@ -3,6 +3,8 @@ import jwt from "jsonwebtoken";
 import ReqAuth from '../common/auth-decoded';
 import { UnauthExc } from '../common/exception';
 import config from "../config/config";
+import { LogStatus } from '../enums/log-status';
+import log_service from '../service/log-service';
 
 function auth_middleware(req: ReqAuth, res: Response, next: NextFunction) {
     if (!req.headers.authorization) {
@@ -17,7 +19,8 @@ function auth_middleware(req: ReqAuth, res: Response, next: NextFunction) {
         if (token) {
             jwt.verify(token, config.TOKEN_SECRET, (error, decoded) => {
                 if (error) {
-                    next(error);
+                    log_service.log(LogStatus.Error, `token verification: ` + error);
+                    next(new UnauthExc("error")); //?
                 } else {
                     try {
                         req.user = decoded;
@@ -28,9 +31,11 @@ function auth_middleware(req: ReqAuth, res: Response, next: NextFunction) {
                 }
             }); 
         } else {
+            log_service.log(LogStatus.Error, `token verification: token not found`);
             next(new UnauthExc());
         }
     } else {
+        log_service.log(LogStatus.Error, `token verification: token not found`);
         next(new UnauthExc());
     }
 }

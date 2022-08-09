@@ -41,7 +41,7 @@ class UserController implements BaseRouter {
         this.router.delete("/:user_id", auth_middleware, this.delete_user);
     }
 
-    private get_users = async (req: Request, res: Response, next: NextFunction) => { //add validation!!
+    private get_users = async (req: Request, res: Response, next: NextFunction) => { //add auth!!
         const user_options = {
             ...req.pag_option,
             name: req.query.name as string,

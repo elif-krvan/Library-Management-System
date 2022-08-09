@@ -16,7 +16,6 @@ export class UserLibraryRepo {
             .insert(lib_book)
             .returning("isbn")
             .then((new_book) => {
-                console.log("new user", new_book)
                 if (new_book[0]) {
                     const data: IISBN = {isbn: new_book[0].isbn};
                     resolve(data);
@@ -38,9 +37,7 @@ export class UserLibraryRepo {
             .where("isbn", lib_book.isbn)
             .del()
             .then((result) => {
-                console.log("new user", result)
                 if (result != 0) {
-                    console.log("lib repo", result)
                     resolve(true);
                 } else {
                     reject(new BookNotFoundExc("book cannot be removed")); 
@@ -102,7 +99,6 @@ export class UserLibraryRepo {
             .where("user_id", lib_book.user_id)
             .where("isbn", lib_book.isbn)
             .then((result) => { 
-                console.log("user_repo_lib", result)               
                 resolve(result[0]);
             })
             .catch((err) => {
