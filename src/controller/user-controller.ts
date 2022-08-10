@@ -2,7 +2,9 @@ import { Router, Request, Response, NextFunction } from 'express';
 import { Exception, ValidationExc } from '../common/exception';
 import { UserFilterParams } from '../common/filter-params';
 import { PaginationOptions } from '../common/pagination-options';
+import { ResponseSuccess } from '../common/response-success';
 import { LogStatus } from '../enums/log-status';
+import { ICreateUser } from '../interface/i-create-user';
 import { FilterUser } from '../interface/i-filter';
 import { IUserId } from '../interface/i-user_id';
 import auth_middleware from '../middleware/auth-middleware';
@@ -104,17 +106,20 @@ class UserController implements BaseRouter {
     }
 
     private add_user = async (req: Request, res: Response, next: NextFunction) => {
-        let new_user: User = {
-            name: req.body.name,
-            surname: req.body.surname,
-            age: req.body.age,
-            send_ads: req.body.send_ads,
-            email: req.body.email,
-            password: req.body.password,
+        let new_user: ICreateUser = {
+            user: {
+                name: req.body.name,
+                surname: req.body.surname,
+                age: req.body.age,
+                send_ads: req.body.send_ads,
+                email: req.body.email,
+                password: req.body.password
+            },            
+            roles: req.body.role
         }
 
         validate_body.validate_add_user(new_user).then(() => {
-            this.userService.create_user(new_user).then((result) => {
+            this.userService.create_user(new_user).then((result) => { //test //test with no role
                 log_service.log(LogStatus.Success, "add a new user, id: " + result.data?.user_id);
                 return res.json(result);
             })
@@ -130,17 +135,20 @@ class UserController implements BaseRouter {
     }
 
     private add_user_v2 = async (req: Request, res: Response, next: NextFunction) => {
-        let new_user: User = {
-            name: req.body.name,
-            surname: req.body.surname,
-            age: req.body.age,
-            send_ads: req.body.send_ads,
-            email: req.body.email,
-            password: req.body.password,
+        let new_user: ICreateUser = {
+            user: {
+                name: req.body.name,
+                surname: req.body.surname,
+                age: req.body.age,
+                send_ads: req.body.send_ads,
+                email: req.body.email,
+                password: req.body.password
+            },            
+            roles: req.body.role
         }
 
-        user_validation.user_schema.validateAsync(new_user).then((validated: User) => {
-            this.userService.create_user(validated).then((result) => {
+        user_validation.user_schema.validateAsync(new_user).then((validated: ICreateUser) => {
+            this.userService.create_user(validated).then((result: ResponseSuccess) => {
                 log_service.log(LogStatus.Success, "added a new user, id: " + result.data?.user_id);
                 return res.json(result);
             })

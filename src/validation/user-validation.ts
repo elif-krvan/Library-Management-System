@@ -1,12 +1,16 @@
 import Joi from "joi";
+import { Roles } from "../enums/roles";
 const user_validation = {
     user_schema: Joi.object({
-        name: Joi.string().min(3).max(50).pattern(new RegExp('^[a-zA-Z]')).required(),
-        surname: Joi.string().min(3).max(50).pattern(new RegExp('^[a-zA-Z]')).required(),
-        age: Joi.number().min(18).required(),
-        send_ads: Joi.boolean().required(),
-        email: Joi.string().email().required(),
-        password: Joi.string().min(5).required() //edit
+        user: Joi.object({
+            name: Joi.string().min(3).max(50).pattern(new RegExp('^[a-zA-Z]')).required(),
+            surname: Joi.string().min(3).max(50).pattern(new RegExp('^[a-zA-Z]')).required(),
+            age: Joi.number().min(18).required(),
+            send_ads: Joi.boolean().required(),
+            email: Joi.string().email().required(),
+            password: Joi.string().min(5).required()
+        }),        
+        roles: Joi.number().valid(...Object.values(Roles)).default(Roles.user)// "\"roles\" must be one of [admin, user, manager, 0, 1, 2]"
     })
     .options({ abortEarly: false }),
 

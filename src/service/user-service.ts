@@ -9,26 +9,39 @@ import { UserLogin } from "../model/user-login";
 import { UserFilterParams } from "../common/filter-params";
 import { UserLibraryService } from "./user-library-service";
 import { IUserId } from "../interface/i-user_id";
+import { RoleRepo } from "../repository/role-repo";
+import { IRole } from "../interface/i-role";
+import { ICreateUser } from "../interface/i-create-user";
 
 export class UserService {
     private userRepo: UserRepo;
     private userLibService: UserLibraryService;
+    private roleRepo: RoleRepo;
 
     constructor() {
         this.userRepo = new UserRepo();
         this.userLibService = new UserLibraryService();
+        this.roleRepo = new RoleRepo();
     }
 
-    create_user(user: User): Promise<ResponseSuccess> {
+    create_user(user_info: ICreateUser): Promise<ResponseSuccess> {
         return new Promise<ResponseSuccess> ((resolve, reject) => {
-            this.userRepo.user_email_exist(user.email).then((exists) => {
+            this.userRepo.user_email_exist(user_info.user.email).then((exists) => {
                 if (exists) {
                     reject(new UserAlreadyExistExc("user email already exists"));
                 } else {
-                    bcrypt.hash(user.password, config.SALT_LENGTH).then((hash) => {
-                        user.password = hash;
-                        this.userRepo.add_new_user(user).then((new_user_id: IUserId) => {
-                            resolve(new ResponseSuccess("ok", new_user_id));                            
+                    bcrypt.hash(user_info.user.password, config.SALT_LENGTH).then((hash) => {
+                        user_info.user.password = hash;
+                        this.userRepo.add_new_user(user_info.user).then((new_user_id: IUserId) => {
+                            const user_roles: IRole = {user_id: new_user_id.user_id, role: user_info.roles as number};
+
+                            this.roleRepo.add_role(user_roles).then(() => {
+                                resolve(new ResponseSuccess("ok", new_user_id)); 
+                            })
+                            .catch((err) => {
+                                reject(err);
+                            });
+                                                       
                         })
                         .catch((err) => {
                             reject(err);

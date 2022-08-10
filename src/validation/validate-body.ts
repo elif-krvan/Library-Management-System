@@ -1,4 +1,6 @@
 import { WrongRequestExc } from "../common/exception";
+import { Roles } from "../enums/roles";
+import { ICreateUser } from "../interface/i-create-user";
 import { User } from "../model/user";
 
 class ValidateBody {
@@ -8,18 +10,18 @@ class ValidateBody {
         age: 0,
         send_ads: false,
         email: "",
-        password: ""
+        password: "",
     }
 
-    validate_add_user(user: User): Promise<WrongRequestExc | boolean> {
+    validate_add_user(user_info: ICreateUser): Promise<WrongRequestExc | boolean> {
         return new Promise<WrongRequestExc | boolean> ((resolve, reject) => {
-            for ( let value of Object.values(user) ) {
+            for ( let value of Object.values(user_info.user) ) {
                 if ( value == undefined || value == null ) {
                     reject(new WrongRequestExc("undefined value"));
                 }
             }
     
-            const {name, surname, age, send_ads, email, password} = user;
+            const {name, surname, age, send_ads, email, password} = user_info.user;
     
             if (typeof name != typeof this.UserReq.name || name.length > 50) {
                 reject(new WrongRequestExc("name type is not string or it exceeds the 50 char limit"))
@@ -49,6 +51,14 @@ class ValidateBody {
 
             if (typeof password != typeof this.UserReq.password || password.length < 5) {
                 reject(new WrongRequestExc("password type is not string or its length is less than 5"))
+            }
+
+            if (user_info.roles == undefined) {
+                user_info.roles = Roles.user;
+            }
+            
+            if (user_info.roles != Roles.user && user_info.roles != Roles.admin && user_info.roles != Roles.manager) { //test
+                reject(new WrongRequestExc("no such user role"))
             }
             
             resolve(true);        
