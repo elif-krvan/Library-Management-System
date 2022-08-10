@@ -1,11 +1,10 @@
 import jwt from "jsonwebtoken";
 import config from "../config/config";
-import { UserLogin } from "../model/user-login";
+import { UserSignInfo } from "../model/user-login";
 import { JWTExc } from "./exception";
 
-function sign_token(user: UserLogin): Promise<string> {
+function sign_token(user: UserSignInfo): Promise<string> {
     return new Promise<string> ((resolve, reject) => {
-        console.log("exp time", config.TOKEN_EXPIRE_TIME);
         try {
             jwt.sign(
                 {

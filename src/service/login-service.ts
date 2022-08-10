@@ -1,10 +1,10 @@
 import { LoginExc } from "../common/exception";
 import { UserRepo } from "../repository/user-repo";
 import bcrypt from 'bcrypt';
-import { UserLogin } from "../model/user-login";
 import { ILogin } from "../interface/i-login";
 import sign_token from "../common/sign-token";
 import { RoleRepo } from "../repository/role-repo";
+import { UserSignInfo } from "../model/user-login";
 
 export class LoginService {
     private userRepo: UserRepo;
@@ -15,9 +15,9 @@ export class LoginService {
         this.roleRepo = new RoleRepo();
     }
 
-    get_user_by_email(email: string): Promise<UserLogin> {
-        return new Promise<UserLogin> ((resolve, reject) => {
-            this.userRepo.get_user_by_email(email).then((user: UserLogin) => {
+    get_user_by_email(email: string): Promise<UserSignInfo> {
+        return new Promise<UserSignInfo> ((resolve, reject) => {
+            this.userRepo.get_user_by_email(email).then((user: UserSignInfo) => {
                 this.roleRepo.get_user_roles(user.user_id).then((role) => {
                     user.role = role;
                     resolve(user);
@@ -35,7 +35,7 @@ export class LoginService {
     login(user_info: ILogin): Promise<string> {
         return new Promise<string> ((resolve, reject) => {
             this.get_user_by_email(user_info.email)
-            .then((user_db: UserLogin) => {
+            .then((user_db: UserSignInfo) => {
                 bcrypt.compare(user_info.password, user_db.password)
                 .then((match) => {
                     if (match) {

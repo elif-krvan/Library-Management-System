@@ -5,13 +5,15 @@ import bcrypt from 'bcrypt';
 import config from "../config/config";
 import {ResponseSuccess } from "../common/response-success";
 import { PaginationOptions } from "../common/pagination-options";
-import { UserLogin } from "../model/user-login";
 import { UserFilterParams } from "../common/filter-params";
 import { UserLibraryService } from "./user-library-service";
 import { IUserId } from "../interface/i-user_id";
 import { RoleRepo } from "../repository/role-repo";
 import { IRole } from "../interface/i-role";
 import { ICreateUser } from "../interface/i-create-user";
+import sign_token from "../common/sign-token";
+import { UserSignInfo } from "../model/user-login";
+import { v4 as uuid } from 'uuid';
 
 export class UserService {
     private userRepo: UserRepo;
@@ -31,17 +33,27 @@ export class UserService {
                     reject(new UserAlreadyExistExc("user email already exists"));
                 } else {
                     bcrypt.hash(user_info.user.password, config.SALT_LENGTH).then((hash) => {
+                        user_info.user.user_id = uuid();
                         user_info.user.password = hash;
-                        this.userRepo.add_new_user(user_info.user).then((new_user_id: IUserId) => {
-                            const user_roles: IRole = {user_id: new_user_id.user_id, role: user_info.roles as number};
 
-                            this.roleRepo.add_role(user_roles).then(() => {
-                                resolve(new ResponseSuccess("ok", new_user_id)); 
+                        sign_token({user_id: user_info.user.user_id, email: user_info.user.email, password: user_info.user.password, role: user_info.roles})
+                        .then((token) => {
+                            user_info.user.confirmation_code = token;
+
+                            this.userRepo.add_new_user(user_info.user).then((new_user_id: IUserId) => {
+                                const user_roles: IRole = {user_id: new_user_id.user_id, role: user_info.roles as number};
+    
+                                this.roleRepo.add_role(user_roles).then(() => {
+                                    resolve(new ResponseSuccess("ok", new_user_id)); 
+                                })
+                                .catch((err) => {
+                                    reject(err);
+                                });
+                                                           
                             })
                             .catch((err) => {
                                 reject(err);
                             });
-                                                       
                         })
                         .catch((err) => {
                             reject(err);
@@ -71,7 +83,7 @@ export class UserService {
 
     get_user_by_email(email: string): Promise<ResponseSuccess> {
         return new Promise<ResponseSuccess> ((resolve, reject) => {
-            this.userRepo.get_user_by_email(email).then((user: UserLogin) => {
+            this.userRepo.get_user_by_email(email).then((user: UserSignInfo) => {
                 resolve(new ResponseSuccess("ok", user));
             })
             .catch((err) => {

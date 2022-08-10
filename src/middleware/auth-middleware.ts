@@ -4,7 +4,7 @@ import ReqAuth from '../common/auth-decoded';
 import { UnauthExc } from '../common/exception';
 import config from "../config/config";
 import { LogStatus } from '../enums/log-status';
-import { UserLogin } from '../model/user-login';
+import { UserSignInfo } from '../model/user-login';
 import log_service from '../service/log-service';
 
 function auth_middleware(req: ReqAuth, res: Response, next: NextFunction) {
@@ -24,7 +24,7 @@ function auth_middleware(req: ReqAuth, res: Response, next: NextFunction) {
                     next(new UnauthExc("error"));
                 } else {
                     try {
-                        req.user = decoded as UserLogin;
+                        req.user = decoded as UserSignInfo;
                         console.log(req.user)
                         next();
                     } catch (error) {

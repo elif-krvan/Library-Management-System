@@ -1,22 +1,20 @@
 import { User } from "../model/user";
-import { v4 as uuid } from 'uuid';
 import { DBExc, UserNotFoundExc } from "../common/exception";
 import db from "../db/db";
 import { UserList } from "../interface/i-user-list";
 import utils from "../common/utils";
 import { PaginationOptions } from "../common/pagination-options";
-import { UserLogin } from "../model/user-login";
+import { UserSignInfo } from "../model/user-login";
 import moment from "moment-timezone";
 import { UserFilterParams } from "../common/filter-params";
 import { IUserId } from "../interface/i-user_id";
+import sign_token from "../common/sign-token";
 
 export class UserRepo {
     
     async add_new_user(user: User): Promise<IUserId> {
         return new Promise<IUserId> (async (resolve, reject) => {
-            user.user_id = uuid();
             user.signup_date = moment().tz("Europe/Istanbul").format();
-            console.log(user.signup_date)
             
             await db.knx("user")
             .insert(user)
@@ -57,8 +55,8 @@ export class UserRepo {
         });      
     }
 
-    async get_user_by_email(email: string): Promise<UserLogin> {
-        return new Promise<UserLogin> (async (resolve, reject) => {
+    async get_user_by_email(email: string): Promise<UserSignInfo> {
+        return new Promise<UserSignInfo> (async (resolve, reject) => {
             await db.knx("user")
             .select("user_id", "email", "password")
             .where("email", email)

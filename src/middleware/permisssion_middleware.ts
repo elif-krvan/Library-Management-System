@@ -1,7 +1,7 @@
 import { Roles } from "../enums/roles";
 import { Response, NextFunction } from 'express';
 import ReqAuth from "../common/auth-decoded";
-import { NoPermissionExc, UnauthExc } from "../common/exception";
+import { NoPermissionExc } from "../common/exception";
 
 function permission_middleware(...allowed_roles: Roles[]) {
     return (req: ReqAuth, res: Response, next: NextFunction) => {

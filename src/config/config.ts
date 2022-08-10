@@ -32,6 +32,10 @@ class Config {
     public OPENLIB_SEARCH_URL: string = process.env.OPENLIB_SEARCH_URL || "http://openlibrary.org/search.json";
     public OPENLIB_WORK_URL: string = process.env.OPENLIB_WORK_URL || "https://openlibrary.org/works/";
 
+    // mail info
+    public MAIL_PASSWORD: string = process.env.MAIL_PASSWORD || "very_secure_password0123";
+    public MAIL_ADDR: string = process.env.MAIL_ADDR || "tech.company0@yahoo.com";
+
     constructor() {
         console.log("configs are loaded");
     }
