@@ -94,3 +94,10 @@ export class BookNotFoundExc extends Exception {
         super(415, "there is no book with this isbn", err);
     }
 }
+
+export class NoPermissionExc extends Exception {
+    constructor(error?: any) {
+        let err: string = error || "no permission";
+        super(401, "unauthorized", err);
+    }
+}

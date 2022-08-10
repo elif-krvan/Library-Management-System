@@ -4,11 +4,13 @@ import { UserFilterParams } from '../common/filter-params';
 import { PaginationOptions } from '../common/pagination-options';
 import { ResponseSuccess } from '../common/response-success';
 import { LogStatus } from '../enums/log-status';
+import { Roles } from '../enums/roles';
 import { ICreateUser } from '../interface/i-create-user';
 import { FilterUser } from '../interface/i-filter';
 import { IUserId } from '../interface/i-user_id';
 import auth_middleware from '../middleware/auth-middleware';
 import pagination_middleware from '../middleware/pagination-middleware';
+import permission_middleware from '../middleware/permisssion_middleware';
 import { User } from '../model/user';
 import { UserLibrary } from '../model/user-library';
 import log_service from '../service/log-service';
@@ -33,15 +35,15 @@ class UserController implements BaseRouter {
     
     init_controller(): void {
         this.router.get("/book", auth_middleware, this.get_user_library);        
-        this.router.get("/:user_id/book", auth_middleware, this.get_user_library_general);
-        this.router.get("/:user_id", auth_middleware, this.get_user_by_id);
+        this.router.get("/:user_id/book", auth_middleware, permission_middleware(Roles.admin, Roles.manager), this.get_user_library_general);
+        this.router.get("/:user_id", auth_middleware, permission_middleware(Roles.admin, Roles.manager), this.get_user_by_id);
         this.router.get("/", pagination_middleware, this.get_users);  
-        this.router.post("/book", auth_middleware, this.add_book);             
-        this.router.post("/:user_id/book/:isbn", auth_middleware, this.add_book_to_user);             
+        this.router.post("/book", auth_middleware, permission_middleware(Roles.user), this.add_book);             
+        this.router.post("/:user_id/book/:isbn", auth_middleware, permission_middleware(Roles.admin), this.add_book_to_user);             
         this.router.post("/", this.add_user);
         this.router.post("/v2", this.add_user_v2);
         this.router.delete("/book", auth_middleware, this.remove_book);
-        this.router.delete("/:user_id/book/:isbn", auth_middleware, this.remove_book_from_user);
+        this.router.delete("/:user_id/book/:isbn", auth_middleware, permission_middleware(Roles.admin), this.remove_book_from_user);
         this.router.delete("/:user_id", auth_middleware, this.delete_user);
     }
 
