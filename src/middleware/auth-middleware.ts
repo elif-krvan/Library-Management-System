@@ -4,6 +4,7 @@ import ReqAuth from '../common/auth-decoded';
 import { UnauthExc } from '../common/exception';
 import config from "../config/config";
 import { LogStatus } from '../enums/log-status';
+import { UserLogin } from '../model/user-login';
 import log_service from '../service/log-service';
 
 function auth_middleware(req: ReqAuth, res: Response, next: NextFunction) {
@@ -20,10 +21,11 @@ function auth_middleware(req: ReqAuth, res: Response, next: NextFunction) {
             jwt.verify(token, config.TOKEN_SECRET, (error, decoded) => {
                 if (error) {
                     log_service.log(LogStatus.Error, `token verification: ` + error);
-                    next(new UnauthExc("error")); //?
+                    next(new UnauthExc("error"));
                 } else {
                     try {
-                        req.user = decoded;
+                        req.user = decoded as UserLogin;
+                        console.log(req.user)
                         next();
                     } catch (error) {
                         next(error);

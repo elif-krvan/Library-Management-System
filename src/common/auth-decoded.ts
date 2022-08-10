@@ -1,16 +1,17 @@
 import { Request } from "express";
 import jwt from "jsonwebtoken";
+import { UserLogin } from "../model/user-login";
 
 declare global {
     namespace Express {
         interface Request {
-            user: any; //fix this
+            user: UserLogin; //fix this
         }
     }
 }
 
 interface ReqAuth extends Request {
-    user: any;
+    user: UserLogin;
 }
 
 export default ReqAuth;

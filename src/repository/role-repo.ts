@@ -31,8 +31,8 @@ export class RoleRepo {
             .where("user_id", user_id)
             .then((result) => {
                 if (result[0]) {
-                    console.log("get roles", result[0]);
-                    resolve(result[0]);
+                    console.log("get roles", result[0].role);
+                    resolve(result[0].role); //!
                 } else {
                     reject(new UserNotFoundExc()); 
                 }  

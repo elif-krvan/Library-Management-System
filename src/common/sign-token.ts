@@ -10,7 +10,8 @@ function sign_token(user: UserLogin): Promise<string> {
             jwt.sign(
                 {
                     email: user.email,
-                    user_id: user.user_id
+                    user_id: user.user_id,
+                    role: user.role
                 },
                 config.TOKEN_SECRET,
                 {
