@@ -9,6 +9,7 @@ import moment from "moment-timezone";
 import { UserFilterParams } from "../common/filter-params";
 import { IUserId } from "../interface/i-user_id";
 import sign_token from "../common/sign-token";
+import { UserStatus } from "../enums/user-status";
 
 export class UserRepo {
     
@@ -64,6 +65,25 @@ export class UserRepo {
                 if (result[0]) {                    
                     result[0].signup_date = moment(result[0].signup_date).tz("Europe/Istanbul").format("DD.MM.YYYY HH:mm");                    
                     resolve(result[0]);
+                } else {
+                    reject(new UserNotFoundExc()); 
+                }  
+            })
+            .catch((err) => {
+                reject(new DBExc(err));
+            }); 
+        });      
+    }
+
+    async update_user_status(user: UserSignInfo): Promise<boolean> {
+        return new Promise<boolean> (async (resolve, reject) => {
+            await db.knx("user")
+            .update({status: UserStatus.Active})
+            .where("user_id", user.user_id)
+            .then((result) => {
+                console.log("update", result)
+                if (result) {                    
+                    resolve(true);
                 } else {
                     reject(new UserNotFoundExc()); 
                 }  

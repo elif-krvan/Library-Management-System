@@ -14,6 +14,7 @@ import { ICreateUser } from "../interface/i-create-user";
 import sign_token from "../common/sign-token";
 import { UserSignInfo } from "../model/user-login";
 import { v4 as uuid } from 'uuid';
+import send_mail from "../common/send-conf-mail";
 
 export class UserService {
     private userRepo: UserRepo;
@@ -44,7 +45,13 @@ export class UserService {
                                 const user_roles: IRole = {user_id: new_user_id.user_id, role: user_info.roles as number};
     
                                 this.roleRepo.add_role(user_roles).then(() => {
-                                    resolve(new ResponseSuccess("ok", new_user_id)); 
+                                    console.log("helloooo")
+                                    send_mail(user_info.user.name, user_info.user.surname, user_info.user.email, token).then(() => {
+                                        resolve(new ResponseSuccess("ok", new_user_id));
+                                    })
+                                    .catch((err) => {
+                                        reject(err);
+                                    });
                                 })
                                 .catch((err) => {
                                     reject(err);

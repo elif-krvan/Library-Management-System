@@ -5,7 +5,7 @@ import { UserStatus } from "../../enums/user-status";
 export async function up(knex: Knex): Promise<void> {
     return knex.schema.alterTable("user", (table) => {
         table.integer("status").notNullable().defaultTo(UserStatus.Pending);
-        table.string("confirmation_code").notNullable().defaultTo("null");
+        table.string("confirmation_code", 600).notNullable().defaultTo("null");
     });
 }
 

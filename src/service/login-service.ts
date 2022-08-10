@@ -5,6 +5,7 @@ import { ILogin } from "../interface/i-login";
 import sign_token from "../common/sign-token";
 import { RoleRepo } from "../repository/role-repo";
 import { UserSignInfo } from "../model/user-login";
+import { ResponseSuccess } from "../common/response-success";
 
 export class LoginService {
     private userRepo: UserRepo;
@@ -25,6 +26,17 @@ export class LoginService {
                 .catch((err) => {
                     reject(err);
                 });
+            })
+            .catch((err) => {
+                reject(err);
+            });
+        });
+    }
+
+    update_user_status(user: UserSignInfo): Promise<ResponseSuccess> {
+        return new Promise<ResponseSuccess> ((resolve, reject) => {
+            this.userRepo.update_user_status(user).then(() => {
+                resolve(new ResponseSuccess("user verification is completed"));            
             })
             .catch((err) => {
                 reject(err);

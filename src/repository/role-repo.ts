@@ -43,7 +43,7 @@ export class RoleRepo {
         });      
     }
 
-    async delete_user(user_id: string): Promise<boolean> {
+    async delete_user(user_id: string): Promise<boolean> {//edt name
         return new Promise<boolean> (async (resolve, reject) => {
             await db.knx("user_role")
             .where("user_id", user_id)
