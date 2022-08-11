@@ -1,5 +1,13 @@
 import config from "../config/config";
-import transport from "./mail-transporter";
+import nodemailer from "nodemailer";
+
+const transport = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+        user: config.MAIL_ADDR,
+        pass: config.MAIL_PASSWORD
+    }
+})
 
 function send_mail(name: string, surname: string, email: string, code: string): Promise<boolean> {
     return new Promise<boolean> ((resolve, reject) => {

@@ -11,10 +11,8 @@ import { IUserId } from "../interface/i-user_id";
 import { RoleRepo } from "../repository/role-repo";
 import { IRole } from "../interface/i-role";
 import { ICreateUser } from "../interface/i-create-user";
-import sign_token from "../common/sign-token";
-import { UserSignInfo } from "../model/user-login";
 import { v4 as uuid } from 'uuid';
-import send_mail from "../common/send-conf-mail";
+import send_mail from "../helpers/send-conf-mail";
 import create_conf_code from "../helpers/create-confirmation-code";
 
 export class UserService {
