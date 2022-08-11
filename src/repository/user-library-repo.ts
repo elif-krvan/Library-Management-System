@@ -1,10 +1,6 @@
 import { BookNotFoundExc, DBExc, UserNotFoundExc } from "../common/exception";
 import db from "../db/db";
-import utils from "../common/utils";
-import { PaginationOptions } from "../common/pagination-options";
-import { UserFilterParams } from "../common/filter-params";
 import { UserLibrary } from "../model/user-library";
-import { UserLibraryList } from "../interface/user-lib-list";
 import { BookList } from "../interface/book-list";
 import { IISBN } from "../interface/i-isbn";
 
@@ -74,17 +70,13 @@ export class UserLibraryRepo {
         });      
     }
 
-    async delete_user(user_id: string): Promise<boolean> {
+    async delete_user_library(user_id: string): Promise<boolean> {
         return new Promise<boolean> (async (resolve, reject) => {
             await db.knx("user_library")
             .where("user_id", user_id)
             .del()
-            .then((result) => {
-                if (result != 0) {
-                    resolve(true);
-                } else {
-                    reject(new UserNotFoundExc()); 
-                }
+            .then(() => {
+                resolve(true);                
             })
             .catch((err) => {
                 reject(new DBExc(err));

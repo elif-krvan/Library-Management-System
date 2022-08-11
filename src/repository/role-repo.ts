@@ -23,8 +23,8 @@ export class RoleRepo {
         });        
     }
 
-    async get_user_roles(user_id: string): Promise<any> { //fix this
-        return new Promise<any> (async (resolve, reject) => {
+    async get_user_roles(user_id: string): Promise<number> { //fix this
+        return new Promise<number> (async (resolve, reject) => {
             await db.knx("user_role")
             .select("role")
             .where("user_id", user_id)
@@ -42,7 +42,7 @@ export class RoleRepo {
         });      
     }
 
-    async delete_user(user_id: string): Promise<boolean> {//edt name
+    async delete_user_roles(user_id: string): Promise<boolean> {
         return new Promise<boolean> (async (resolve, reject) => {
             await db.knx("user_role")
             .where("user_id", user_id)

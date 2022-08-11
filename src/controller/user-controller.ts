@@ -42,7 +42,8 @@ class UserController implements BaseRouter {
         this.router.post("/v2", this.add_user_v2);
         this.router.delete("/book", auth_middleware, this.remove_book);
         this.router.delete("/:user_id/book/:isbn", auth_middleware, permission_middleware(Roles.admin), this.remove_book_from_user);
-        this.router.delete("/:user_id", auth_middleware, this.delete_user);
+        this.router.delete("/:user_id", auth_middleware, permission_middleware(Roles.admin), this.delete_user);
+        this.router.delete("/", auth_middleware, permission_middleware(Roles.user), this.delete_account);
     }
 
     private get_users = async (req: Request, res: Response, next: NextFunction) => {
@@ -166,19 +167,40 @@ class UserController implements BaseRouter {
 
     private delete_user = async (req: Request, res: Response, next: NextFunction) => {
         // delete the user if it exists
-        const id: string = req.params.user_id;
-        user_validation.id_schema.validateAsync(id).then((validated: string) => {
+        const user_id: string = req.params.user_id;
+        const admin_id: string = req.user.user_id;
+        user_validation.id_schema.validateAsync(user_id).then((validated: string) => {
             this.userService.delete_user(validated).then((result) => {
-                log_service.log(LogStatus.Success, `user deleted ${validated} via user ${req.user.user_id}`);
+                log_service.log(LogStatus.Success, `user deleted ${validated} via user ${admin_id}`);
                 return res.json(result);
             })
             .catch((err) => { //user with parameter id does not exist
-                log_service.log(LogStatus.Error, `delete user ${validated} via user ${req.user.user_id}: ` + err);
+                log_service.log(LogStatus.Error, `delete user ${validated} via user ${admin_id}: ` + err);
                 next(err);
             });
         })
         .catch((err) => { //the parameter is in the wrong format
-            log_service.log(LogStatus.Error, `delete user ${id} via user ${req.user.user_id}: ` + err);
+            log_service.log(LogStatus.Error, `delete user ${user_id} via user ${admin_id}: ` + err);
+            const exc: Exception = new ValidationExc(err);
+            next(exc);
+        });
+    }
+
+    private delete_account = async (req: Request, res: Response, next: NextFunction) => {
+        // delete the user if it exists
+        const user_id: string = req.user.user_id;
+        user_validation.id_schema.validateAsync(user_id).then((validated: string) => {
+            this.userService.delete_user(validated).then((result) => {
+                log_service.log(LogStatus.Success, `user deleted ${validated} via user ${user_id}`);
+                return res.json(result);
+            })
+            .catch((err) => { //user with parameter id does not exist
+                log_service.log(LogStatus.Error, `delete user ${validated} via user ${user_id}: ` + err);
+                next(err);
+            });
+        })
+        .catch((err) => { //the parameter is in the wrong format
+            log_service.log(LogStatus.Error, `delete user ${user_id} via user ${user_id}: ` + err);
             const exc: Exception = new ValidationExc(err);
             next(exc);
         });
@@ -193,7 +215,7 @@ class UserController implements BaseRouter {
                 isbn: validated_isbn
             }
             
-            this.libraryService.add_book(lib_book).then((result) => {
+            this.libraryService.add_book_to_user(lib_book).then((result) => {
                 log_service.log(LogStatus.Success, "user add book to library");
                 return res.json(result);
             })
@@ -266,7 +288,7 @@ class UserController implements BaseRouter {
                 isbn: validated_isbn
             }
 
-            this.libraryService.remove_book(lib_book).then((result) => {
+            this.libraryService.remove_book_from_user(lib_book).then((result) => {
                 log_service.log(LogStatus.Success, `user remove book ${lib_book.isbn} via user ${lib_book.user_id}`);
                 return res.json(result);
             })
@@ -297,7 +319,7 @@ class UserController implements BaseRouter {
         const user_id: string = req.params.user_id as string;
 
         user_validation.id_schema.validateAsync(user_id).then((validated_user_id) => {
-            this.libraryService.get_user_library_general(validated_user_id).then((result) => {
+            this.libraryService.get_user_library(validated_user_id).then((result) => {
                 log_service.log(LogStatus.Success, `get user library ${validated_user_id} via user ${req.user.user_id}: `);
                 return res.json(result);
             })

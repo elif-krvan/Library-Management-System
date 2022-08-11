@@ -8,7 +8,6 @@ import { UserSignInfo } from "../model/user-login";
 import moment from "moment-timezone";
 import { UserFilterParams } from "../common/filter-params";
 import { IUserId } from "../interface/i-user_id";
-import sign_token from "../common/sign-token";
 import { UserStatus } from "../enums/user-status";
 
 export class UserRepo {
@@ -22,7 +21,6 @@ export class UserRepo {
             .returning(["user_id", "id", "name", "surname", "send_ads", "email", "signup_date"])
             .then((new_user) => {
                 if (new_user[0]) {
-                    console.log(new_user);
                     new_user[0].signup_date = moment(new_user[0].signup_date).tz("Europe/Istanbul").format("DD.MM.YYYY HH:mm");
                     const new_user_id: IUserId = {user_id: new_user[0].user_id};
                     resolve(new_user_id);
@@ -176,7 +174,6 @@ export class UserRepo {
                 })
                 .then((result) => {
                     if (result.length != 0) {
-                        console.log(result[0])
                         for (let user of result) {
                             user.signup_date = moment(user.signup_date).tz("Europe/Istanbul").format();
                         } 

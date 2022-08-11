@@ -98,18 +98,25 @@ export class UserService {
 
     delete_user(user_id: string): Promise<ResponseSuccess> {
         return new Promise<ResponseSuccess> ((resolve, reject) => {
-            this.userRepo.delete_user(user_id).then((result) => { //resultu kullanayım mı
-                this.userLibService.delete_user(user_id).then((res) => {
-                    resolve(new ResponseSuccess("user is deleted"));
+            this.roleRepo.delete_user_roles(user_id).then(() => {
+                this.userLibService.delete_user_library(user_id).then((result) => {
+                    this.userRepo.delete_user(user_id).then((res) => {
+                        resolve(new ResponseSuccess("user is deleted"));
+                    })
+                    .catch((err) => {
+                        console.log(1)
+                        reject(err);
+                    });                    
                 })
                 .catch((err) => {
+                    console.log(12)
                     reject(err);
-                })
-                
+                });
             })
             .catch((err) => {
+                console.log(123)
                 reject(err);
-            })
+            });
         });
     }
 

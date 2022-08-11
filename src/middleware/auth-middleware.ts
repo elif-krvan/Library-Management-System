@@ -25,7 +25,6 @@ function auth_middleware(req: ReqAuth, res: Response, next: NextFunction) {
                 } else {
                     try {
                         req.user = decoded as UserSignInfo;
-                        console.log(req.user)
                         next();
                     } catch (error) {
                         next(error);

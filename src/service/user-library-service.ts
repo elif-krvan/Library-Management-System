@@ -1,7 +1,5 @@
-import { BookExistExc, BookNotFoundExc, UserAlreadyExistExc, UserNotFoundExc } from "../common/exception";
+import { BookExistExc, BookNotFoundExc, UserNotFoundExc } from "../common/exception";
 import {ResponseSuccess } from "../common/response-success";
-import { PaginationOptions } from "../common/pagination-options";
-import { UserFilterParams } from "../common/filter-params";
 import { UserLibraryRepo } from "../repository/user-library-repo";
 import { BookService } from "./book-service";
 import { UserLibrary } from "../model/user-library";
@@ -51,29 +49,13 @@ export class UserLibraryService {
                 if (!user_exist) {
                     reject(new UserNotFoundExc());
                 } else {
-                    this.libRepo.isbn_exist(lib_book).then(async (book_in_library) => {
-                        if (book_in_library) {
-                            reject(new BookExistExc());
-                        } else {
-                            this.bookService.add_book(lib_book.isbn).then(() => { //if the book is not in the books library add it to the library first
-                                
-                                this.libRepo.add_book(lib_book).then((new_book_isbn: IISBN) => {
-                                    resolve(new ResponseSuccess("book is added to library", new_book_isbn));
-                                })
-                                .catch((err) => {
-                                    reject(err);
-                                });
-                            })
-                            .catch((err) => {
-                                reject(err);
-                            });
-                        }                
+                    this.add_book(lib_book).then((result) => {
+                        resolve(result);
                     })
                     .catch((err) => {
                         reject(err);
                     });
-                }
-                
+                }                
             })
             .catch((err) => {
                 reject(err);
@@ -95,8 +77,11 @@ export class UserLibraryService {
                 } else {
                     reject(new BookNotFoundExc());
                 }                
+            })
+            .catch((err) => {
+                reject(err);
             });            
-        })
+        });
     }
 
     remove_book_from_user(lib_book: UserLibrary): Promise<ResponseSuccess> {
@@ -105,66 +90,48 @@ export class UserLibraryService {
                 if (!user_exist) {
                     reject(new UserNotFoundExc());
                 } else {
-                    this.libRepo.isbn_exist(lib_book).then(async (book_in_library) => {
-                        if (book_in_library) {
-                            //remove book from the library
-                            this.libRepo.remove_book(lib_book).then((res) => {
-                                resolve(new ResponseSuccess("book is removed from the library"));
-                            })
-                            .catch((err) => {
-                                reject(err);
-                            })
-                        } else {
-                            reject(new BookNotFoundExc());
-                        }                
-                    });
-                }
-            })
-            .catch((err) => {
-                reject(err);
-            })                        
-        })
-    }
-
-    get_user_library(user_id: string): Promise<ResponseSuccess> {
-        return new Promise<ResponseSuccess> ((resolve, reject) => {
-            this.libRepo.get_user_library(user_id).then((data) => {
-                resolve(new ResponseSuccess("ok", data));
-            })
-            .catch((err) => {
-                reject(err);
-            })
-        });
-    }
-
-    get_user_library_general(user_id: string): Promise<ResponseSuccess> {
-        return new Promise<ResponseSuccess> ((resolve, reject) => {
-            this.userRepo.user_id_exist(user_id).then((user_exist) => {
-                if (!user_exist) {
-                    reject(new UserNotFoundExc());
-                } else {
-                    this.get_user_library(user_id).then((result) => {
+                    this.remove_book(lib_book).then((result) => {
                         resolve(result);
                     })
-                    .catch((err)=> {
+                    .catch((err) => {
                         reject(err);
                     })
                 }
             })
             .catch((err) => {
                 reject(err);
-            })
+            }) ;                       
         });
     }
 
-    delete_user(user_id: string): Promise<boolean> {
+    get_user_library(user_id: string): Promise<ResponseSuccess> {
+        return new Promise<ResponseSuccess> ((resolve, reject) => {
+            this.userRepo.user_id_exist(user_id).then((user_exist) => {
+                if (!user_exist) {
+                    reject(new UserNotFoundExc());
+                } else {
+                    this.libRepo.get_user_library(user_id).then((data) => {
+                        resolve(new ResponseSuccess("ok", data));
+                    })
+                    .catch((err) => {
+                        reject(err);
+                    });
+                }
+            })
+            .catch((err) => {
+                reject(err);
+            });
+        });
+    }
+
+    delete_user_library(user_id: string): Promise<boolean> {
         return new Promise<boolean> ((resolve, reject) => {
-            this.libRepo.delete_user(user_id).then((result) => {
+            this.libRepo.delete_user_library(user_id).then((result) => {
                 resolve(result);
             })
             .catch((err) => {
                 reject(err);
-            })
+            });
         });
     }
 }

@@ -43,7 +43,7 @@ export class ApiLibraryService {
                 if (res.status != 200) {
                     reject(new AxiosExc());
                 } else if (Object.keys(res.data).length === 0) {
-                    reject(new BookNotFoundExc());              
+                    reject(new BookNotFoundExc("book not found"));              
                 } else {
                     const book_info = JSON.parse(JSON.stringify(res.data))[`ISBN:${isbn}`];
                     const book: Book = {
@@ -54,7 +54,6 @@ export class ApiLibraryService {
                         publish_date: moment(book_info.publish_date).format("YYYY"),
                         cover: book_info.cover.medium
                     };
-                    console.log("book", book)
                     resolve(book);
                 }                
             })
@@ -118,7 +117,6 @@ export class ApiLibraryService {
 
     private get_authors(authors: any): string[] {
         let author_names: string[] = [];
-        console.log("auth: ", authors)
 
         for (let obj of authors) {
             author_names.push(obj.name);
