@@ -50,8 +50,8 @@ export class LoginService {
         });
     }
 
-    login(user_info: ILogin): Promise<string> {
-        return new Promise<string> ((resolve, reject) => {
+    login(user_info: ILogin): Promise<ResponseSuccess> {
+        return new Promise<ResponseSuccess> ((resolve, reject) => {
             this.get_user_by_email(user_info.email)
             .then((user_db: UserSignInfo) => {
                 bcrypt.compare(user_info.password, user_db.password)
@@ -59,7 +59,7 @@ export class LoginService {
                     if (match) {
                         sign_token(user_db)
                         .then((token) => {
-                            resolve(token);
+                            resolve(new ResponseSuccess("login is successful", {token: token}));
                         })
                         .catch((err) => {
                             reject(err);

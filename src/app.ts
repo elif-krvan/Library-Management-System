@@ -1,7 +1,7 @@
 import express, { Application } from "express"
 import bodyparser from 'body-parser';
-import login_controller from './controller/login-controller';
 import user_controller from './controller/user-controller';
+import auth_controller from './controller/auth-controller';
 import db from "./db/db";
 import error_middleware from "./middleware/error-middleware";
 import config from "./config/config";
@@ -40,7 +40,7 @@ export class App {
     load_router() {
         this.app.use("/", this.appRouter);
         this.appRouter.use("/user", user_controller);
-        this.appRouter.use("/auth", login_controller);
+        this.appRouter.use("/auth", auth_controller);
         this.appRouter.use("/book", book_controller);
     }
 

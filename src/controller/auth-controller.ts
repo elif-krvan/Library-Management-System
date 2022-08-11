@@ -5,9 +5,8 @@ import BaseRouter from './base-router';
 import { ResponseSuccess } from '../common/response-success';
 import auth_middleware from '../middleware/auth-middleware';
 import { LoginService } from '../service/login-service';
-import verification_middleware from '../middleware/verification-middleware';
 
-class LoginController implements BaseRouter {
+class AuthController implements BaseRouter {
     router: Router;
     loginService: LoginService;
 
@@ -29,8 +28,8 @@ class LoginController implements BaseRouter {
         login_validation.user_info_schema.validateAsync((user_info))
         .then((validated_user_info: ILogin) => {
             this.loginService.login(validated_user_info)
-            .then((token: string) => {
-                res.json(new ResponseSuccess("login is successful", {token: token}));
+            .then((result) => {
+                res.json(result);
             })
             .catch((err) => {
                 next(err);
@@ -48,15 +47,19 @@ class LoginController implements BaseRouter {
     private confirm_user = async (req: Request, res: Response, next: NextFunction) => {
         const code = req.params.confirmation_code;
 
-        this.loginService.confirm_user(code).then((result) => {
-            res.json(result);
+        login_validation.verification_code_schema.validateAsync(code).then((validated_code: string) => {
+            this.loginService.confirm_user(validated_code).then((result) => {
+                res.json(result);
+            })
+            .catch((err) => {
+                next(err);
+            });
         })
         .catch((err) => {
             next(err);
-        })
-
+        });
     }
 }
 
-const login_controller = new LoginController();
-export default login_controller.router;
+const auth_controller = new AuthController();
+export default auth_controller.router;
