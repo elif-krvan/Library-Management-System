@@ -33,10 +33,16 @@ export class LoginService {
         });
     }
 
-    update_user_status(user: UserSignInfo): Promise<ResponseSuccess> {
+    confirm_user(code: string): Promise<ResponseSuccess> {
         return new Promise<ResponseSuccess> ((resolve, reject) => {
-            this.userRepo.update_user_status(user).then(() => {
-                resolve(new ResponseSuccess("user verification is completed"));            
+            this.userRepo.get_user_by_code(code).then((user_id) => {
+                this.userRepo.update_user_status(user_id).then(() => {
+                    resolve(new ResponseSuccess("user verification is completed")); 
+                })
+                .catch((err) => {
+                    reject(err);
+                })
+                           
             })
             .catch((err) => {
                 reject(err);

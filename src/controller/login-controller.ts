@@ -20,7 +20,7 @@ class LoginController implements BaseRouter {
     init_controller(): void {
         this.router.post("/login", this.login);
         this.router.get("/test", auth_middleware, this.test);
-        this.router.get("/:confirmation_code", verification_middleware, this.confirm_user);
+        this.router.get("/:confirmation_code", this.confirm_user);
     }
 
     private login = async (req: Request, res: Response, next: NextFunction) => {
@@ -48,7 +48,7 @@ class LoginController implements BaseRouter {
     private confirm_user = async (req: Request, res: Response, next: NextFunction) => {
         const code = req.params.confirmation_code;
 
-        this.loginService.update_user_status(req.user).then((result) => {
+        this.loginService.confirm_user(code).then((result) => {
             res.json(result);
         })
         .catch((err) => {

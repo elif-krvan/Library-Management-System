@@ -104,3 +104,7 @@ dist
 .tern-port
 
 /src/config/config.ts
+
+dist
+
+node_modules

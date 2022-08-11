@@ -15,6 +15,7 @@ import sign_token from "../common/sign-token";
 import { UserSignInfo } from "../model/user-login";
 import { v4 as uuid } from 'uuid';
 import send_mail from "../common/send-conf-mail";
+import create_conf_code from "../helpers/create-confirmation-code";
 
 export class UserService {
     private userRepo: UserRepo;
@@ -37,15 +38,13 @@ export class UserService {
                         user_info.user.user_id = uuid();
                         user_info.user.password = hash;
 
-                        sign_token({user_id: user_info.user.user_id, email: user_info.user.email, password: user_info.user.password, role: user_info.roles})
-                        .then((token) => {
+                        create_conf_code().then((token) => {
                             user_info.user.confirmation_code = token;
 
                             this.userRepo.add_new_user(user_info.user).then((new_user_id: IUserId) => {
                                 const user_roles: IRole = {user_id: new_user_id.user_id, role: user_info.roles as number};
     
                                 this.roleRepo.add_role(user_roles).then(() => {
-                                    console.log("helloooo")
                                     send_mail(user_info.user.name, user_info.user.surname, user_info.user.email, token).then(() => {
                                         resolve(new ResponseSuccess("ok", new_user_id));
                                     })
