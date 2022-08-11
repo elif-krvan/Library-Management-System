@@ -56,17 +56,18 @@ export class UserRepo {
         });      
     }
 
-    async get_user_by_email(email: string): Promise<UserSignInfo> {
+    async get_active_user_by_email(email: string): Promise<UserSignInfo> {
         return new Promise<UserSignInfo> (async (resolve, reject) => {
             await db.knx("user")
             .select("user_id", "email", "password")
             .where("email", email)
+            .where("status", UserStatus.Active)
             .then((result) => {
                 if (result[0]) {                    
                     result[0].signup_date = moment(result[0].signup_date).tz("Europe/Istanbul").format("DD.MM.YYYY HH:mm");                    
                     resolve(result[0]);
                 } else {
-                    reject(new UserNotFoundExc()); 
+                    reject(new UserNotFoundExc("no active user")); 
                 }  
             })
             .catch((err) => {

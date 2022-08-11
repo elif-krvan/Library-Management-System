@@ -16,9 +16,9 @@ export class LoginService {
         this.roleRepo = new RoleRepo();
     }
 
-    get_user_by_email(email: string): Promise<UserSignInfo> {
+    get_active_user_by_email(email: string): Promise<UserSignInfo> {
         return new Promise<UserSignInfo> ((resolve, reject) => {
-            this.userRepo.get_user_by_email(email).then((user: UserSignInfo) => {
+            this.userRepo.get_active_user_by_email(email).then((user: UserSignInfo) => {
                 this.roleRepo.get_user_roles(user.user_id).then((role) => {
                     user.role = role;
                     resolve(user);
@@ -52,7 +52,7 @@ export class LoginService {
 
     login(user_info: ILogin): Promise<ResponseSuccess> {
         return new Promise<ResponseSuccess> ((resolve, reject) => {
-            this.get_user_by_email(user_info.email)
+            this.get_active_user_by_email(user_info.email)
             .then((user_db: UserSignInfo) => {
                 bcrypt.compare(user_info.password, user_db.password)
                 .then((match) => {

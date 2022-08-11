@@ -87,17 +87,6 @@ export class UserService {
         });
     }
 
-    get_user_by_email(email: string): Promise<ResponseSuccess> {
-        return new Promise<ResponseSuccess> ((resolve, reject) => {
-            this.userRepo.get_user_by_email(email).then((user: UserSignInfo) => {
-                resolve(new ResponseSuccess("ok", user));
-            })
-            .catch((err) => {
-                reject(err);
-            })
-        });
-    }
-
     get_users(filter: UserFilterParams, options: PaginationOptions): Promise<ResponseSuccess> {
         return new Promise<ResponseSuccess> ((resolve, reject) => {
             this.userRepo.get_users(filter, options).then((data) => {
