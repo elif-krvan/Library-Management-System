@@ -12,7 +12,6 @@ export class RoleRepo {
             .returning("id")
             .then((new_role) => {
                 if (new_role[0]) {
-                    console.log("role reppo", new_role);
                     resolve(true);
                 } else {
                     reject(new DBExc("new role cannot be added")); 

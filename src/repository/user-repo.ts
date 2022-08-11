@@ -75,15 +75,32 @@ export class UserRepo {
         });      
     }
 
-    async update_user_status(user: UserSignInfo): Promise<boolean> {
+    async update_user_status(user_id: string): Promise<boolean> {
         return new Promise<boolean> (async (resolve, reject) => {
             await db.knx("user")
             .update({status: UserStatus.Active})
-            .where("user_id", user.user_id)
+            .where("user_id", user_id)
             .then((result) => {
-                console.log("update", result)
                 if (result) {                    
                     resolve(true);
+                } else {
+                    reject(new UserNotFoundExc()); 
+                }  
+            })
+            .catch((err) => {
+                reject(new DBExc(err));
+            }); 
+        });      
+    }
+
+    async get_user_by_code(code: string): Promise<string> {
+        return new Promise<string> (async (resolve, reject) => {
+            await db.knx("user")
+            .select("user_id")
+            .where("confirmation_code", code)
+            .then((result) => {
+                if (result[0]) {                    
+                    resolve(result[0].user_id);
                 } else {
                     reject(new UserNotFoundExc()); 
                 }  
