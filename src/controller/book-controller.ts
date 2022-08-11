@@ -19,10 +19,10 @@ class BookController implements BaseRouter {
     }
 
     init_controller() {
-        this.router.get("/", this.get_book);
+        this.router.get("/", this.search_book);
     }
 
-    private get_book = async (req: Request, res: Response, next: NextFunction) => {
+    private search_book = async (req: Request, res: Response, next: NextFunction) => {
 
         const search_param = {
             isbn: req.query.isbn as string,
@@ -33,7 +33,7 @@ class BookController implements BaseRouter {
             console.log("isbn", validated)
             const search: BookSearchParams = new BookSearchParams(validated)
             this.apiLibraryService.search_book(search).then((book) => {
-                log_service.log(LogStatus.Success, "get user book");
+                log_service.log(LogStatus.Success, "search book");
                 return res.json(new ResponseSuccess("ok", {book: book}));
             })
             .catch((err) => {
@@ -41,6 +41,7 @@ class BookController implements BaseRouter {
             });
         })
         .catch((err) => {
+            log_service.log(LogStatus.Error, "search book");
             const exc: Exception = new ValidationExc(err);
             next(exc);
         });        

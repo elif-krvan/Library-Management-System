@@ -105,6 +105,6 @@ dist
 
 /src/config/config.ts
 
-dist
+/dist
 
-node_modules
+/node_modules

@@ -7,11 +7,9 @@ import { LogStatus } from '../enums/log-status';
 import { Roles } from '../enums/roles';
 import { ICreateUser } from '../interface/i-create-user';
 import { FilterUser } from '../interface/i-filter';
-import { IUserId } from '../interface/i-user_id';
 import auth_middleware from '../middleware/auth-middleware';
 import pagination_middleware from '../middleware/pagination-middleware';
 import permission_middleware from '../middleware/permisssion_middleware';
-import { User } from '../model/user';
 import { UserLibrary } from '../model/user-library';
 import log_service from '../service/log-service';
 import { UserLibraryService } from '../service/user-library-service';
@@ -47,7 +45,7 @@ class UserController implements BaseRouter {
         this.router.delete("/:user_id", auth_middleware, this.delete_user);
     }
 
-    private get_users = async (req: Request, res: Response, next: NextFunction) => { //add auth!!
+    private get_users = async (req: Request, res: Response, next: NextFunction) => {
         const user_options = {
             ...req.pag_option,
             name: req.query.name as string,
@@ -121,7 +119,7 @@ class UserController implements BaseRouter {
         }
 
         validate_body.validate_add_user(new_user).then(() => {
-            this.userService.create_user(new_user).then((result) => { //test //test with no role
+            this.userService.create_user(new_user).then((result) => {
                 log_service.log(LogStatus.Success, "add a new user, id: " + result.data?.user_id);
                 return res.json(result);
             })

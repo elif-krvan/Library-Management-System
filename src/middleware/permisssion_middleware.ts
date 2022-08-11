@@ -8,7 +8,7 @@ function permission_middleware(...allowed_roles: Roles[]) {
         const user_role: Roles = req.user.role;
 
         if (user_role === undefined) {
-            next(new NoPermissionExc()); //baska exc?
+            next(new NoPermissionExc());
         }
         const result = allowed_roles.find(val => val == user_role);
         

@@ -46,7 +46,6 @@ export class ApiLibraryService {
                     reject(new BookNotFoundExc());              
                 } else {
                     const book_info = JSON.parse(JSON.stringify(res.data))[`ISBN:${isbn}`];
-                    // console.log("bookinf ", book_info)
                     const book: Book = {
                         isbn: isbn,
                         title: book_info.title,
