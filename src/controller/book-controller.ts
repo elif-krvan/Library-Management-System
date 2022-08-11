@@ -31,15 +31,16 @@ class BookController implements BaseRouter {
         library_validation.search_schema.validateAsync(search_param).then((validated) => {
             const search: BookSearchParams = new BookSearchParams(validated)
             this.apiLibraryService.search_book(search).then((book) => {
-                log_service.log(LogStatus.Success, "search book");
+                log_service.log(LogStatus.Success, `search book: ${validated}`);
                 return res.json(new ResponseSuccess("ok", {book: book}));
             })
             .catch((err) => {
+                log_service.log(LogStatus.Error, `search book: ${validated}`);
                 next(err);
             });
         })
         .catch((err) => {
-            log_service.log(LogStatus.Error, "search book");
+            log_service.log(LogStatus.Error, `search book: ${search_param}`);
             const exc: Exception = new ValidationExc(err);
             next(exc);
         });        

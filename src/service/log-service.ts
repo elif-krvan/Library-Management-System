@@ -1,5 +1,5 @@
-import moment from "moment-timezone";
 import { LogStatus } from "../enums/log-status";
+import moment from "moment-timezone";
 
 class LogService {
 

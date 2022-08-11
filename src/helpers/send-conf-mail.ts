@@ -25,7 +25,7 @@ function send_mail(name: string, surname: string, email: string, code: string): 
             </div>`
         })
         .then((result) => {
-            console.log(`confirmation mail is sent, mail id: ${result.messageId}`);
+            console.log(`confirmation mail is sent to ${email}, mail id: ${result.messageId}`);
             resolve(true);
         })
         .catch((err) => {

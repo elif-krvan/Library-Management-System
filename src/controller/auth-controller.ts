@@ -5,6 +5,8 @@ import BaseRouter from './base-router';
 import { ResponseSuccess } from '../common/response-success';
 import auth_middleware from '../middleware/auth-middleware';
 import { LoginService } from '../service/login-service';
+import log_service from '../service/log-service';
+import { LogStatus } from '../enums/log-status';
 
 class AuthController implements BaseRouter {
     router: Router;
@@ -29,13 +31,16 @@ class AuthController implements BaseRouter {
         .then((validated_user_info: ILogin) => {
             this.loginService.login(validated_user_info)
             .then((result) => {
+                log_service.log(LogStatus.Success, `user login: ${validated_user_info.email}`);
                 res.json(result);
             })
             .catch((err) => {
+                log_service.log(LogStatus.Error, `user login: ${user_info.email}`);
                 next(err);
             })            
         })
         .catch((err) => {
+            log_service.log(LogStatus.Error, `user login: ${user_info.email}`);
             next(err);
         })
     }
@@ -49,13 +54,16 @@ class AuthController implements BaseRouter {
 
         login_validation.verification_code_schema.validateAsync(code).then((validated_code: string) => {
             this.loginService.confirm_user(validated_code).then((result) => {
+                log_service.log(LogStatus.Success, `user confirmed with code: ${validated_code}`);
                 res.json(result);
             })
             .catch((err) => {
+                log_service.log(LogStatus.Error, `user confirmation: ${code}`);
                 next(err);
             });
         })
         .catch((err) => {
+            log_service.log(LogStatus.Error, `user confirmation: ${code}`);
             next(err);
         });
     }

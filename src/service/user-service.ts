@@ -1,8 +1,8 @@
 import { UserAlreadyExistExc } from "../common/exception";
 import { User } from "../model/user";
 import { UserRepo } from "../repository/user-repo";
-import bcrypt from 'bcrypt';
 import config from "../config/config";
+import bcrypt from 'bcrypt';
 import {ResponseSuccess } from "../common/response-success";
 import { PaginationOptions } from "../common/pagination-options";
 import { UserFilterParams } from "../common/filter-params";

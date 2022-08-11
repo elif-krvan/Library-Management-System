@@ -103,8 +103,4 @@ dist
 # TernJS port file
 .tern-port
 
-/src/config/config.ts
 
-/dist
-
-/node_modules
